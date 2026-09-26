@@ -142,6 +142,24 @@
   #log .row.b span.who{color:var(--b);}
   #log .empty{padding:14px;text-align:center;color:#aba898;}
 
+  .lib-row{
+    display:flex;justify-content:space-between;align-items:center;gap:10px;
+    background:#fff;border:1.5px solid var(--line);border-radius:var(--radius);
+    padding:12px 12px;margin-bottom:8px;
+  }
+  .lib-row .lib-main{min-width:0;flex:1;}
+  .lib-row .lib-title{font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .lib-row .lib-meta{font-size:11.5px;color:#8a887f;margin-top:2px;}
+  .lib-row .lib-badge{
+    font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;margin-left:6px;
+    background:var(--a-soft);color:var(--a);vertical-align:middle;
+  }
+  .lib-row .lib-badge.done{background:#E4F1E8;color:var(--win);}
+  .lib-row .lib-del{
+    border:none;background:none;color:#B5622A;font-size:18px;padding:4px 6px;flex:none;
+  }
+  .lib-empty{text-align:center;color:#aba898;font-size:13px;padding:30px 10px;}
+
   details{border:1.5px solid var(--line);border-radius:var(--radius);background:#fff;padding:0;}
   details summary{padding:11px 12px;font-size:12.5px;font-weight:600;color:#6b6a63;list-style:none;display:flex;justify-content:space-between;cursor:pointer;}
   details summary::-webkit-details-marker{display:none;}
@@ -159,9 +177,15 @@
     <h1>Match Tracker</h1>
     <p class="sub">Tracks the score, plus how every point actually ends — winners, forced/unforced errors, aces, return winners, double faults.</p>
 
+    <button id="libraryBtn" style="width:100%;margin-bottom:18px;padding:13px;border:1.5px solid var(--court);border-radius:var(--radius);background:#fff;color:var(--court);font-size:14px;font-weight:600;">My matches <span id="libraryCount" style="color:#8a887f;font-weight:400;"></span></button>
+
     <div class="field">
       <label>Match date</label>
       <input type="date" id="matchDate" style="width:100%;padding:12px;border:1.5px solid var(--line);border-radius:var(--radius);font-size:16px;">
+    </div>
+    <div class="field">
+      <label>Match time</label>
+      <input type="time" id="matchTime" style="width:100%;padding:12px;border:1.5px solid var(--line);border-radius:var(--radius);font-size:16px;">
     </div>
     <div class="field">
       <label>Player A</label>
@@ -201,10 +225,18 @@
     </div>
 
     <button id="startBtn">Start match</button>
-    <button id="loadSampleBtn" style="width:100%;margin-top:10px;padding:12px;border:1.5px solid var(--line);border-radius:var(--radius);background:#fff;color:#6b6a63;font-size:13.5px;">Load sample match (Sunlight vs Opponent, Set 1)</button>
     <button id="importBtn" style="width:100%;margin-top:10px;padding:12px;border:1.5px solid var(--line);border-radius:var(--radius);background:#fff;color:#6b6a63;font-size:13.5px;">Import match file (.json)</button>
     <input type="file" id="importFile" accept="application/json,.json" style="display:none;">
     <div id="importStatus" style="margin-top:8px;font-size:12.5px;color:var(--err);"></div>
+  </div>
+
+  <!-- LIBRARY -->
+  <div id="library" style="display:none;padding:20px 14px;max-width:420px;margin:0 auto;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <h1 style="font-size:20px;margin:0;">My matches</h1>
+      <button id="libraryNewBtn" style="padding:9px 14px;border:none;border-radius:8px;background:var(--court);color:#fff;font-size:13px;font-weight:600;">+ New</button>
+    </div>
+    <div id="libraryList"></div>
   </div>
 
   <!-- MATCH -->
@@ -284,6 +316,9 @@
       <button id="resetBtn">New match</button>
     </div>
     <div class="util-row" style="margin-top:8px;">
+      <button id="libraryNavBtn">My matches</button>
+    </div>
+    <div class="util-row" style="margin-top:8px;">
       <button id="exportBtn">Export match (.json)</button>
     </div>
     <div id="exportFallback" style="display:none;margin-top:8px;border:1.5px solid var(--line);border-radius:var(--radius);background:#fff;padding:10px;">
@@ -359,22 +394,112 @@
 
   var S = null;      // current match state
   var history = [];  // stack of previous states for undo
-  var STORAGE_KEY = "tennisMatchTracker_v1";
+  var INDEX_KEY = "ttMatches_index_v1";
+  var ACTIVE_KEY = "ttActiveMatchId_v1";
 
-  function saveToStorage(){
+  function newId(){
+    return "m_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2,8);
+  }
+  function loadIndex(){
+    try{ return JSON.parse(localStorage.getItem(INDEX_KEY) || "[]"); }catch(e){ return []; }
+  }
+  function saveIndex(idx){
+    try{ localStorage.setItem(INDEX_KEY, JSON.stringify(idx)); }catch(e){}
+  }
+  function matchSummaryStr(st){
+    var setsStr = st.completedSets.map(function(s){ return s.a+"\u2013"+s.b; }).join(", ");
+    var live = (st.gamesA||st.gamesB) ? " ("+st.gamesA+"\u2013"+st.gamesB+" in progress)" : "";
+    return (setsStr || "0\u20130") + live + " \u00b7 sets " + st.setWinsA + "\u2013" + st.setWinsB;
+  }
+  function upsertIndexEntry(st){
+    if(!st || !st.id) return;
+    var idx = loadIndex();
+    var entry = {
+      id: st.id, date: st.matchDate, time: st.matchTime, nameA: st.names.A, nameB: st.names.B,
+      naturalKey: matchNaturalKey(st),
+      summary: matchSummaryStr(st), lastUpdated: new Date().toISOString(), matchOver: st.matchOver
+    };
+    var pos = idx.findIndex(function(e){ return e.id === st.id; });
+    if(pos>=0) idx[pos] = entry; else idx.unshift(entry);
+    saveIndex(idx);
+  }
+  function saveActiveMatch(){
+    if(!S) return;
+    if(!S.id) S.id = newId();          // heals any match loaded before the library existed
+    if(!S.matchTime) S.matchTime = nowTimeStr();
     try{
-      if(S) localStorage.setItem(STORAGE_KEY, JSON.stringify(S));
+      localStorage.setItem("ttMatch_"+S.id, JSON.stringify(S));
+      localStorage.setItem(ACTIVE_KEY, S.id);
     }catch(e){ /* storage unavailable — app still works, just won't persist */ }
+    upsertIndexEntry(S);
   }
-  function clearStorage(){
-    try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
-  }
-  function loadFromStorage(){
+  function loadMatchById(id){
     try{
-      var raw = localStorage.getItem(STORAGE_KEY);
-      if(!raw) return null;
-      return JSON.parse(raw);
+      var raw = localStorage.getItem("ttMatch_"+id);
+      return raw ? JSON.parse(raw) : null;
     }catch(e){ return null; }
+  }
+  function deleteMatchById(id){
+    try{ localStorage.removeItem("ttMatch_"+id); }catch(e){}
+    saveIndex(loadIndex().filter(function(e){ return e.id !== id; }));
+    try{
+      if(localStorage.getItem(ACTIVE_KEY) === id) localStorage.removeItem(ACTIVE_KEY);
+    }catch(e){}
+  }
+  function clearActivePointer(){
+    try{ localStorage.removeItem(ACTIVE_KEY); }catch(e){}
+  }
+
+  function fmtDate(d){
+    if(!d) return "";
+    var parts = d.split("-");
+    if(parts.length!==3) return d;
+    var months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    return months[parseInt(parts[1],10)-1] + " " + parseInt(parts[2],10) + ", " + parts[0];
+  }
+
+  function renderLibrary(){
+    var list = loadIndex();
+    var el = document.getElementById("libraryList");
+    var countEl = document.getElementById("libraryCount");
+    if(countEl) countEl.textContent = list.length ? ("(" + list.length + ")") : "";
+    if(list.length===0){
+      el.innerHTML = '<div class="lib-empty">No saved matches yet — start one, or import a .json file from another device.</div>';
+      return;
+    }
+    list.sort(function(a,b){
+      var ka = (a.date||"")+" "+(a.time||"00:00");
+      var kb = (b.date||"")+" "+(b.time||"00:00");
+      if(ka !== kb) return ka < kb ? 1 : -1;
+      return (b.lastUpdated||"") < (a.lastUpdated||"") ? -1 : 1;
+    });
+    el.innerHTML = list.map(function(e){
+      var badge = e.matchOver ? '<span class="lib-badge done">Final</span>' : '<span class="lib-badge">In progress</span>';
+      return '<div class="lib-row" data-id="'+e.id+'">'+
+        '<div class="lib-main" data-action="open">'+
+          '<div class="lib-title">'+e.nameA+' vs '+e.nameB+badge+'</div>'+
+          '<div class="lib-meta">'+fmtDate(e.date)+(e.time?' \u00b7 '+fmtTime(e.time):'')+' \u00b7 '+e.summary+'</div>'+
+        '</div>'+
+        '<button class="lib-del" data-action="delete" title="Delete">\u2715</button>'+
+      '</div>';
+    }).join("");
+  }
+
+  function openMatchFromLibrary(id){
+    var m = loadMatchById(id);
+    if(!m) return;
+    S = m;
+    history = [];
+    document.getElementById("library").style.display = "none";
+    document.getElementById("setup").style.display = "none";
+    document.getElementById("match").style.display = "block";
+    render();
+  }
+
+  function updateLibraryBadge(){
+    var n = loadIndex().length;
+    var el = document.getElementById("libraryCount");
+    if(el) el.textContent = n ? ("(" + n + ")") : "";
   }
 
   // ---------- export / import ----------
@@ -388,7 +513,8 @@
     };
   }
   function buildExportFilename(){
-    return S.matchDate + "_" + safeFileName(S.names.A) + "_vs_" + safeFileName(S.names.B) + ".json";
+    var t = (S.matchTime || "0000").replace(":","");
+    return S.matchDate + "_" + t + "_" + safeFileName(S.names.A) + "_vs_" + safeFileName(S.names.B) + ".json";
   }
 
   function showExportFallback(json){
@@ -442,9 +568,27 @@
       return false;
     }
     if(!st.matchDate) st.matchDate = payload.matchDate || todayStr();
+    if(!st.matchTime) st.matchTime = "00:00";
+
+    // Date + time + player names identify "the same match" across devices —
+    // if we already have an entry like this, ask before creating a duplicate.
+    var key = matchNaturalKey(st);
+    var existing = loadIndex().find(function(e){ return e.naturalKey === key; });
+    if(existing){
+      var overwrite = confirm(
+        "A match already exists for " + existing.nameA + " vs " + existing.nameB +
+        " on " + fmtDate(existing.date) + (existing.time ? " " + fmtTime(existing.time) : "") +
+        ".\n\nOK = replace it with this import.\nCancel = keep both as separate entries."
+      );
+      st.id = overwrite ? existing.id : newId();
+    } else {
+      st.id = newId();
+    }
+
     S = st;
     history = [];
     document.getElementById("setup").style.display = "none";
+    document.getElementById("library").style.display = "none";
     document.getElementById("match").style.display = "block";
     render();
     return true;
@@ -462,6 +606,7 @@
     return {
       names:{A:nameA, B:nameB},
       matchDate: opts.matchDate || todayStr(),
+      matchTime: opts.matchTime || nowTimeStr(),
       matchFormat: opts.matchFormat,
       bestOf: opts.bestOf,
       setsToWin: setsToWin,
@@ -493,8 +638,25 @@
     var day = String(d.getDate()).padStart(2,"0");
     return d.getFullYear()+"-"+m+"-"+day;
   }
+  function nowTimeStr(){
+    var d = new Date();
+    return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");
+  }
   function safeFileName(s){
     return String(s).trim().replace(/[^a-zA-Z0-9_-]+/g,"_").replace(/^_+|_+$/g,"") || "player";
+  }
+  function fmtTime(t){
+    if(!t) return "";
+    var parts = t.split(":");
+    if(parts.length<2) return t;
+    var h = parseInt(parts[0],10), m = parts[1];
+    var ampm = h>=12 ? "PM" : "AM";
+    var h12 = h % 12; if(h12===0) h12 = 12;
+    return h12+":"+m+" "+ampm;
+  }
+  function matchNaturalKey(st){
+    return (st.matchDate||"")+"_"+(st.matchTime||"")+"_"+
+      safeFileName(st.names.A).toLowerCase()+"_"+safeFileName(st.names.B).toLowerCase();
   }
 
   function pushHistory(){
@@ -717,7 +879,7 @@
     drawGameChart();
     drawShareChart();
     drawBarChart();
-    saveToStorage();
+    saveActiveMatch();
   }
 
   function drawGrowthChart(){
@@ -885,52 +1047,11 @@
     el.innerHTML = html;
   }
 
-  // ---------- sample match (reconstructed from user's Sunlight vs Opponent notes) ----------
-  // Server alternates A,B,A,B... starting with A (Sunlight) — this is the only rotation
-  // consistent with every ace/double-fault entry in the raw notes without contradiction.
-  // Game 1's "opponent serve point" therefore falls in Sunlight's service game, so it is
-  // read as a return winner for the opponent, not an ace.
-  var SAMPLE_MATCH = [
-    // Game 1 — Opponent 4-0
-    {t:"unforced",p:"A"},{t:"unforced",p:"A"},{t:"unforced",p:"A"},{t:"returnWinner"},
-    // Game 2 — Sunlight 4-1
-    {t:"unforced",p:"B"},{t:"winner",p:"A"},{t:"forced",p:"A"},{t:"unforced",p:"B"},{t:"forced",p:"B"},
-    // Game 3 — Sunlight 4-2
-    {t:"ace"},{t:"winner",p:"B"},{t:"winner",p:"A"},{t:"unforced",p:"B"},{t:"df"},{t:"unforced",p:"B"},
-    // Game 4 — Sunlight 4-3 (No-Ad / sudden point at 3-3)
-    {t:"__noadon"},
-    {t:"unforced",p:"A"},{t:"unforced",p:"B"},{t:"winner",p:"A"},{t:"unforced",p:"A"},{t:"forced",p:"A"},{t:"unforced",p:"B"},{t:"winner",p:"A"},
-    {t:"__noadoff"},
-    // Game 5 — Sunlight 4-1
-    {t:"ace"},{t:"ace"},{t:"unforced",p:"B"},{t:"df"},{t:"unforced",p:"B"},
-    // Game 6 — Opponent 4-2
-    {t:"unforced",p:"A"},{t:"unforced",p:"B"},{t:"overrule",p:"B"},{t:"winner",p:"B"},{t:"forced",p:"B"},{t:"unforced",p:"A"},
-    // Game 7 — Sunlight 4-2
-    {t:"unforced",p:"A"},{t:"unforced",p:"A"},{t:"forced",p:"B"},{t:"winner",p:"A"},{t:"unforced",p:"B"},{t:"forced",p:"B"},
-    // Game 8 — Opponent 4-1
-    {t:"overrule",p:"B"},{t:"forced",p:"A"},{t:"unforced",p:"A"},{t:"forced",p:"B"},{t:"winner",p:"B"},
-    // Game 9 — Opponent 4-2
-    {t:"overrule",p:"B"},{t:"forced",p:"A"},{t:"forced",p:"B"},{t:"winner",p:"B"},{t:"unforced",p:"B"},{t:"unforced",p:"A"},
-    // Game 10 — Sunlight 4-1 (Sunlight wins Set 1, 6 games to 4)
-    {t:"unforced",p:"B"},{t:"winner",p:"A"},{t:"forced",p:"A"},{t:"forced",p:"B"},{t:"unforced",p:"B"}
-  ];
-
-  document.getElementById("loadSampleBtn").addEventListener("click", function(){
-    S = newMatch("Sunlight", "Opponent", {matchFormat:"standard", bestOf:3, firstServer:"A"});
-    history = [];
-    SAMPLE_MATCH.forEach(function(step){
-      if(step.t==="__noadon"){ S.noAd = true; return; }
-      if(step.t==="__noadoff"){ S.noAd = false; return; }
-      recordPoint(step.t, step.p);
-    });
-    document.getElementById("setup").style.display = "none";
-    document.getElementById("match").style.display = "block";
-    render();
-  });
-
   // ---------- setup screen wiring ----------
   var chosenFormat = 3, chosenServer = "A", chosenMatchFormat = "standard";
   document.getElementById("matchDate").value = todayStr();
+  document.getElementById("matchTime").value = nowTimeStr();
+  updateLibraryBadge();
 
   document.getElementById("matchFormatSeg").addEventListener("click", function(e){
     var b = e.target.closest("button"); if(!b) return;
@@ -964,7 +1085,8 @@
     var nameA = document.getElementById("nameA").value.trim() || "Player A";
     var nameB = document.getElementById("nameB").value.trim() || "Player B";
     var matchDate = document.getElementById("matchDate").value || todayStr();
-    var opts = { matchFormat: chosenMatchFormat, bestOf: chosenFormat, firstServer: chosenServer, matchDate: matchDate };
+    var matchTime = document.getElementById("matchTime").value || nowTimeStr();
+    var opts = { matchFormat: chosenMatchFormat, bestOf: chosenFormat, firstServer: chosenServer, matchDate: matchDate, matchTime: matchTime };
     if(chosenMatchFormat==="custom"){
       var g = parseInt(document.getElementById("gamesPerSet").value,10);
       var st = parseInt(document.getElementById("setsToWin").value,10);
@@ -972,6 +1094,7 @@
       opts.setsToWin = (st && st>=1) ? st : 6;
     }
     S = newMatch(nameA, nameB, opts);
+    S.id = newId();
     history = [];
     document.getElementById("noAdSeg").querySelectorAll("button").forEach(function(x){x.classList.remove("active");});
     document.getElementById("noAdSeg").querySelector('[data-v="ad"]').classList.add("active");
@@ -1033,17 +1156,50 @@
 
   document.getElementById("undoBtn").addEventListener("click", undo);
   document.getElementById("resetBtn").addEventListener("click", function(){
-    if(S && S.log.length>0){
-      if(!confirm("Start a new match? Current match data will be lost.")) return;
-    }
-    clearStorage();
+    clearActivePointer();
     document.getElementById("match").style.display = "none";
     document.getElementById("setup").style.display = "block";
+    updateLibraryBadge();
+  });
+
+  // ---------- library screen wiring ----------
+  document.getElementById("libraryBtn").addEventListener("click", function(){
+    document.getElementById("setup").style.display = "none";
+    document.getElementById("library").style.display = "block";
+    renderLibrary();
+  });
+  document.getElementById("libraryNavBtn").addEventListener("click", function(){
+    document.getElementById("match").style.display = "none";
+    document.getElementById("library").style.display = "block";
+    renderLibrary();
+  });
+  document.getElementById("libraryNewBtn").addEventListener("click", function(){
+    document.getElementById("library").style.display = "none";
+    document.getElementById("setup").style.display = "block";
+    updateLibraryBadge();
+  });
+  document.getElementById("libraryList").addEventListener("click", function(e){
+    var row = e.target.closest(".lib-row");
+    if(!row) return;
+    var id = row.dataset.id;
+    var actionEl = e.target.closest("[data-action]");
+    var action = actionEl ? actionEl.dataset.action : "open";
+    if(action === "delete"){
+      if(confirm("Delete this match? This can't be undone.")){
+        deleteMatchById(id);
+        renderLibrary();
+      }
+    } else {
+      openMatchFromLibrary(id);
+    }
   });
 
   // ---------- restore a previously in-progress match, if any ----------
   (function tryRestore(){
-    var saved = loadFromStorage();
+    var activeId = null;
+    try{ activeId = localStorage.getItem(ACTIVE_KEY); }catch(e){}
+    if(!activeId) return;
+    var saved = loadMatchById(activeId);
     if(!saved) return;
     S = saved;
     history = [];
