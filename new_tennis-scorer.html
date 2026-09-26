@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Match Tracker</title>
+<style>
+  :root{
+    --ink:#12201A;
+    --paper:#F7F6F2;
+    --court:#1B4332;
+    --court-line:#EDEAE1;
+    --a:#2E5C8A;
+    --a-soft:#E7EEF5;
+    --b:#B5622A;
+    --b-soft:#F6E9DE;
+    --win:#2E7D4F;
+    --err:#B23A3A;
+    --line:#DEDAD0;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  .app{max-width:520px;margin:0 auto;padding:0 14px 40px;}
+
+  /* ---------- Setup screen ---------- */
+  #setup{padding:28px 14px;max-width:420px;margin:0 auto;}
+  #setup h1{font-size:22px;margin:0 0 4px;letter-spacing:-0.01em;}
+  #setup p.sub{margin:0 0 24px;color:#6b6a63;font-size:14px;line-height:1.5;}
+  .field{margin-bottom:18px;}
+  .field label{display:block;font-size:12.5px;color:#6b6a63;margin-bottom:6px;}
+  .field input[type=text]{
+    width:100%;padding:12px 12px;border:1.5px solid var(--line);border-radius:var(--radius);
+    font-size:16px;background:#fff;color:var(--ink);
+  }
+  .seg{display:flex;border:1.5px solid var(--line);border-radius:var(--radius);overflow:hidden;}
+  .seg button{
+    flex:1;padding:11px 8px;border:none;background:#fff;font-size:14px;color:var(--ink);
+    border-right:1.5px solid var(--line);
+  }
+  .seg button:last-child{border-right:none;}
+  .seg button.active{background:var(--court);color:#fff;}
+  #noAdSeg button{font-size:12.5px;padding:10px 6px;}
+  #startBtn{
+    width:100%;margin-top:8px;padding:15px;border:none;border-radius:var(--radius);
+    background:var(--court);color:#fff;font-size:16px;font-weight:600;
+  }
+  #startBtn:active{opacity:.85;}
+
+  /* ---------- Match screen ---------- */
+  #match{display:none;}
+  header.scoreboard{
+    background:var(--court);color:#fff;border-radius:var(--radius);
+    padding:14px 16px;margin:12px 0 14px;
+  }
+  .sb-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;}
+  .sb-row + .sb-row{border-top:1px solid rgba(255,255,255,.14);}
+  .sb-name{display:flex;align-items:center;gap:8px;font-size:15.5px;font-weight:600;min-width:0;}
+  .sb-name .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:120px;}
+  .serve-dot{width:7px;height:7px;border-radius:50%;background:#F4C542;flex:none;visibility:hidden;}
+  .serve-dot.on{visibility:visible;}
+  .sb-nums{display:flex;gap:14px;align-items:baseline;font-variant-numeric:tabular-nums;}
+  .sb-nums .sets{font-size:14px;opacity:.75;min-width:14px;text-align:center;}
+  .sb-nums .games{font-size:17px;opacity:.9;min-width:16px;text-align:center;}
+  .sb-nums .pts{font-size:24px;font-weight:700;min-width:34px;text-align:center;}
+  .tb-tag{font-size:10.5px;opacity:.75;letter-spacing:.02em;margin-top:2px;text-align:right;}
+
+  .banner{
+    display:none;background:#fff;border:1.5px solid var(--line);border-radius:var(--radius);
+    padding:14px;margin-bottom:14px;text-align:center;font-size:15px;
+  }
+  .banner.show{display:block;}
+  .banner b{display:block;font-size:17px;margin-bottom:2px;}
+
+  section.block{margin-bottom:16px;}
+  section.block h2{
+    font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:#8a887f;
+    margin:0 0 8px;font-weight:600;
+  }
+  .serve-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+  .serve-grid button{
+    padding:13px 6px;border-radius:var(--radius);border:1.5px solid var(--line);
+    background:#fff;font-size:13px;font-weight:600;color:var(--ink);line-height:1.25;
+  }
+  .serve-grid button small{display:block;font-weight:400;color:#8a887f;font-size:11px;margin-top:2px;}
+  .serve-grid button:active{transform:scale(.97);}
+  .serve-grid button.ace{border-color:var(--win);color:var(--win);}
+  .serve-grid button.df{border-color:var(--err);color:var(--err);}
+
+  .player-cols{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .pcol{border:1.5px solid var(--line);border-radius:var(--radius);padding:10px;background:#fff;}
+  .pcol .ptitle{font-size:13px;font-weight:700;margin-bottom:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .pcol.A .ptitle{color:var(--a);}
+  .pcol.B .ptitle{color:var(--b);}
+  .pcol button{
+    width:100%;text-align:left;padding:10px 10px;margin-bottom:6px;border-radius:8px;
+    border:1.5px solid var(--line);background:var(--paper);font-size:13.5px;color:var(--ink);font-weight:600;
+  }
+  .pcol button:last-child{margin-bottom:0;}
+  .pcol button:active{transform:scale(.98);}
+  .pcol button.winner{border-color:var(--win);}
+  .pcol button.unforced,.pcol button.forced{border-color:var(--err);}
+  .err-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:2px;}
+  .err-grid button{margin-bottom:0;font-size:11.5px;padding:9px 6px;text-align:center;}
+  .win-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+  .win-grid button{margin-bottom:0;font-size:11.5px;padding:9px 6px;text-align:center;}
+
+  .util-row{display:flex;gap:10px;margin-top:4px;}
+  .util-row button{
+    flex:1;padding:11px;border-radius:var(--radius);border:1.5px solid var(--line);
+    background:#fff;font-size:13.5px;font-weight:600;color:var(--ink);
+  }
+  .util-row button:disabled{opacity:.35;}
+
+  table.stats{width:100%;border-collapse:collapse;font-size:13px;background:#fff;border-radius:var(--radius);overflow:hidden;border:1.5px solid var(--line);}
+  table.stats th,table.stats td{padding:8px 8px;text-align:center;border-bottom:1px solid var(--line);}
+  table.stats th{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:#8a887f;font-weight:600;background:var(--paper);}
+  table.stats td:first-child,table.stats th:first-child{text-align:left;color:#6b6a63;}
+  table.stats tr:last-child td{border-bottom:none;}
+  table.stats td.a{color:var(--a);font-weight:700;}
+  table.stats td.b{color:var(--b);font-weight:700;}
+
+  #log{max-height:180px;overflow-y:auto;font-size:12.5px;color:#6b6a63;border:1.5px solid var(--line);border-radius:var(--radius);background:#fff;}
+  #log .row{padding:8px 10px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:8px;}
+  #log .row:last-child{border-bottom:none;}
+  #log .row span.who{font-weight:600;}
+  #log .row.a span.who{color:var(--a);}
+  #log .row.b span.who{color:var(--b);}
+  #log .empty{padding:14px;text-align:center;color:#aba898;}
+
+  details{border:1.5px solid var(--line);border-radius:var(--radius);background:#fff;padding:0;}
+  details summary{padding:11px 12px;font-size:12.5px;font-weight:600;color:#6b6a63;list-style:none;display:flex;justify-content:space-between;cursor:pointer;}
+  details summary::-webkit-details-marker{display:none;}
+  details summary::after{content:"▾";color:#aba898;}
+  details[open] summary::after{content:"▴";}
+  details .inner{padding:0 12px 12px;}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- SETUP -->
+  <div id="setup">
+    <h1>Match Tracker</h1>
+    <p class="sub">Tracks the score, plus how every point actually ends — winners, forced/unforced errors, aces, return winners, double faults.</p>
+
+    <div class="field">
+      <label>Player A</label>
+      <input type="text" id="nameA" placeholder="Player A" maxlength="18">
+    </div>
+    <div class="field">
+      <label>Player B</label>
+      <input type="text" id="nameB" placeholder="Player B" maxlength="18">
+    </div>
+    <div class="field">
+      <label>Match format</label>
+      <div class="seg" id="matchFormatSeg">
+        <button data-v="standard" class="active">Standard sets</button>
+        <button data-v="custom">Race format</button>
+      </div>
+    </div>
+    <div class="field" id="standardFields">
+      <label>Best of</label>
+      <div class="seg" id="formatSeg">
+        <button data-v="3" class="active">Best of 3</button>
+        <button data-v="5">Best of 5</button>
+      </div>
+    </div>
+    <div class="field" id="customFields" style="display:none;">
+      <label>Games to win a set</label>
+      <input type="text" inputmode="numeric" id="gamesPerSet" value="6" style="width:100%;padding:12px;border:1.5px solid var(--line);border-radius:var(--radius);font-size:16px;">
+      <label style="margin-top:12px;">Sets to win the match</label>
+      <input type="text" inputmode="numeric" id="setsToWin" value="6" style="width:100%;padding:12px;border:1.5px solid var(--line);border-radius:var(--radius);font-size:16px;">
+      <p class="sub" id="tbNote" style="margin:8px 0 0;">Tiebreak triggers at 5–5.</p>
+    </div>
+    <div class="field">
+      <label>First serve</label>
+      <div class="seg" id="serverSeg">
+        <button data-v="A" class="active">Player A</button>
+        <button data-v="B">Player B</button>
+      </div>
+    </div>
+
+    <button id="startBtn">Start match</button>
+    <button id="loadSampleBtn" style="width:100%;margin-top:10px;padding:12px;border:1.5px solid var(--line);border-radius:var(--radius);background:#fff;color:#6b6a63;font-size:13.5px;">Load sample match (Sunlight vs Opponent, Set 1)</button>
+  </div>
+
+  <!-- MATCH -->
+  <div id="match">
+
+    <header class="scoreboard">
+      <div class="sb-row">
+        <div class="sb-name"><span class="serve-dot" id="dotA"></span><span class="nm" id="sbNameA">Player A</span></div>
+        <div class="sb-nums"><span class="sets" id="setsA"></span><span class="games" id="gamesA">0</span><span class="pts" id="ptsA">0</span></div>
+      </div>
+      <div class="sb-row">
+        <div class="sb-name"><span class="serve-dot" id="dotB"></span><span class="nm" id="sbNameB">Player B</span></div>
+        <div class="sb-nums"><span class="sets" id="setsB"></span><span class="games" id="gamesB">0</span><span class="pts" id="ptsB">0</span></div>
+      </div>
+      <div class="tb-tag" id="tbTag"></div>
+      <div class="tb-tag" id="formatTag" style="opacity:.65;"></div>
+    </header>
+
+    <div class="banner" id="banner"><b id="bannerTitle"></b><span id="bannerSub"></span></div>
+
+    <div class="seg" id="noAdSeg" style="margin-bottom:14px;">
+      <button data-v="ad" class="active">Ad scoring</button>
+      <button data-v="noad">No-Ad (deuce = next pt)</button>
+    </div>
+
+    <section class="block" id="serveBlock">
+      <h2 id="serveHeading">Serve — Player A</h2>
+      <div class="serve-grid">
+        <button class="ace" id="btnAce">Ace<small>server wins</small></button>
+        <button id="btnReturnWinner">Return winner<small>returner wins</small></button>
+        <button class="df" id="btnDF">Double fault<small>returner wins</small></button>
+      </div>
+    </section>
+
+    <section class="block">
+      <h2>Rally outcome</h2>
+      <div class="player-cols">
+        <div class="pcol A">
+          <div class="ptitle" id="colNameA">Player A</div>
+          <div class="win-grid">
+            <button class="winner" data-p="A" data-t="fhWinner">FH Winner</button>
+            <button class="winner" data-p="A" data-t="bhWinner">BH Winner</button>
+          </div>
+          <div class="err-grid">
+            <button class="forced" data-p="A" data-t="fhForced">FH Forced</button>
+            <button class="forced" data-p="A" data-t="bhForced">BH Forced</button>
+            <button class="unforced" data-p="A" data-t="fhUnforced">FH Unforced</button>
+            <button class="unforced" data-p="A" data-t="bhUnforced">BH Unforced</button>
+          </div>
+        </div>
+        <div class="pcol B">
+          <div class="ptitle" id="colNameB">Player B</div>
+          <div class="win-grid">
+            <button class="winner" data-p="B" data-t="fhWinner">FH Winner</button>
+            <button class="winner" data-p="B" data-t="bhWinner">BH Winner</button>
+          </div>
+          <div class="err-grid">
+            <button class="forced" data-p="B" data-t="fhForced">FH Forced</button>
+            <button class="forced" data-p="B" data-t="bhForced">BH Forced</button>
+            <button class="unforced" data-p="B" data-t="fhUnforced">FH Unforced</button>
+            <button class="unforced" data-p="B" data-t="bhUnforced">BH Unforced</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="block">
+      <h2>Officiating (not a shot outcome)</h2>
+      <div class="serve-grid" style="grid-template-columns:1fr 1fr;">
+        <button id="btnOverruleA" style="border-color:#8a887f;color:#4a4940;">Bad call<small id="ovLabelA">→ Player A pt</small></button>
+        <button id="btnOverruleB" style="border-color:#8a887f;color:#4a4940;">Bad call<small id="ovLabelB">→ Player B pt</small></button>
+      </div>
+    </section>
+
+    <div class="util-row">
+      <button id="undoBtn" disabled>Undo last point</button>
+      <button id="resetBtn">New match</button>
+    </div>
+
+    <section class="block" style="margin-top:16px;">
+      <h2>Match stats</h2>
+      <table class="stats" id="statsTable">
+        <thead><tr><th></th><th id="stA">A</th><th id="stB">B</th></tr></thead>
+        <tbody>
+          <tr><td>Winner — Forehand</td><td class="a" id="s_fhWinner_A">0</td><td class="b" id="s_fhWinner_B">0</td></tr>
+          <tr><td>Winner — Backhand</td><td class="a" id="s_bhWinner_A">0</td><td class="b" id="s_bhWinner_B">0</td></tr>
+          <tr><td>Winner — Other</td><td class="a" id="s_winner_A">0</td><td class="b" id="s_winner_B">0</td></tr>
+          <tr><td>Return winners</td><td class="a" id="s_returnWinner_A">0</td><td class="b" id="s_returnWinner_B">0</td></tr>
+          <tr><td>Aces</td><td class="a" id="s_ace_A">0</td><td class="b" id="s_ace_B">0</td></tr>
+          <tr><td>Forced — Forehand</td><td class="a" id="s_fhForced_A">0</td><td class="b" id="s_fhForced_B">0</td></tr>
+          <tr><td>Forced — Backhand</td><td class="a" id="s_bhForced_A">0</td><td class="b" id="s_bhForced_B">0</td></tr>
+          <tr><td>Forced — Other</td><td class="a" id="s_forced_A">0</td><td class="b" id="s_forced_B">0</td></tr>
+          <tr><td>Unforced — Forehand</td><td class="a" id="s_fhUnforced_A">0</td><td class="b" id="s_fhUnforced_B">0</td></tr>
+          <tr><td>Unforced — Backhand</td><td class="a" id="s_bhUnforced_A">0</td><td class="b" id="s_bhUnforced_B">0</td></tr>
+          <tr><td>Unforced — Other</td><td class="a" id="s_unforced_A">0</td><td class="b" id="s_unforced_B">0</td></tr>
+          <tr><td>Double faults</td><td class="a" id="s_df_A">0</td><td class="b" id="s_df_B">0</td></tr>
+          <tr><td>Bad calls (pts)</td><td class="a" id="s_overrule_A">0</td><td class="b" id="s_overrule_B">0</td></tr>
+          <tr><td><b>Points won</b></td><td class="a" id="s_points_A"><b>0</b></td><td class="b" id="s_points_B"><b>0</b></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="block" style="margin-top:16px;">
+      <h2>Match growth</h2>
+      <div id="growthChart" style="border:1.5px solid var(--line);border-radius:var(--radius);background:#fff;padding:10px;"></div>
+      <div id="growthLegend" style="display:flex;gap:16px;justify-content:center;font-size:11.5px;color:#6b6a63;margin-top:6px;"></div>
+    </section>
+
+    <section class="block">
+      <h2>Games won by game</h2>
+      <div id="gameChart" style="border:1.5px solid var(--line);border-radius:var(--radius);background:#fff;padding:10px;"></div>
+    </section>
+
+    <section class="block">
+      <h2>Points share</h2>
+      <div id="shareChart" style="border:1.5px solid var(--line);border-radius:var(--radius);background:#fff;padding:10px;display:flex;align-items:center;justify-content:center;gap:18px;"></div>
+    </section>
+
+    <section class="block">
+      <h2>Shot outcomes</h2>
+      <div id="barChart" style="border:1.5px solid var(--line);border-radius:var(--radius);background:#fff;padding:10px;"></div>
+    </section>
+
+    <details style="margin-top:14px;">
+      <summary>Point-by-point log</summary>
+      <div class="inner"><div id="log"></div></div>
+    </details>
+
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var TYPE_LABEL = {
+    ace:"Ace", df:"Double fault", returnWinner:"Return winner",
+    winner:"Winner", forced:"Forced error", unforced:"Unforced error",
+    overrule:"Bad call / overrule",
+    fhForced:"Forehand forced error", bhForced:"Backhand forced error",
+    fhUnforced:"Forehand unforced error", bhUnforced:"Backhand unforced error",
+    fhWinner:"Forehand winner", bhWinner:"Backhand winner"
+  };
+
+  var S = null;      // current match state
+  var history = [];  // stack of previous states for undo
+
+  function freshStats(){
+    return {ace:0, df:0, returnWinner:0, winner:0, forced:0, unforced:0, overrule:0,
+            fhForced:0, bhForced:0, fhUnforced:0, bhUnforced:0, fhWinner:0, bhWinner:0, points:0};
+  }
+
+  function newMatch(nameA, nameB, opts){
+    var setsToWin = opts.matchFormat==="custom" ? opts.setsToWin : Math.ceil(opts.bestOf/2);
+    var gamesPerSet = opts.matchFormat==="custom" ? opts.gamesPerSet : 6;
+    var tbEarly = opts.matchFormat==="custom"; // custom: TB at (G-1)-(G-1); standard: TB at G-G (i.e. 6-6)
+    return {
+      names:{A:nameA, B:nameB},
+      matchFormat: opts.matchFormat,
+      bestOf: opts.bestOf,
+      setsToWin: setsToWin,
+      gamesPerSet: gamesPerSet,
+      tbEarly: tbEarly,
+      server: opts.firstServer,
+      setWinsA:0, setWinsB:0,
+      completedSets:[],
+      gamesA:0, gamesB:0,
+      ptsA:0, ptsB:0,
+      inTB:false,
+      tbA:0, tbB:0,
+      tbStartServer:null,
+      tbPointsPlayed:0,
+      noAd:false,
+      matchOver:false,
+      winner:null,
+      stats:{A:freshStats(), B:freshStats()},
+      log:[],
+      gameBoundaries:[]
+    };
+  }
+
+  function opp(p){ return p==="A" ? "B" : "A"; }
+  function clone(o){ return JSON.parse(JSON.stringify(o)); }
+
+  function pushHistory(){
+    history.push(clone(S));
+    if(history.length>500) history.shift();
+  }
+
+  function currentServer(){
+    if(!S.inTB) return S.server;
+    var i = S.tbPointsPlayed;
+    if(i===0) return S.tbStartServer;
+    var pairIndex = Math.floor((i-1)/2);
+    return (pairIndex % 2 === 0) ? opp(S.tbStartServer) : S.tbStartServer;
+  }
+
+  function recordPoint(type, actorPlayer){
+    if(S.matchOver) return;
+    pushHistory();
+
+    var winnerOfPoint;
+    var actor;
+    switch(type){
+      case "ace": actor = currentServer(); winnerOfPoint = actor; break;
+      case "df": actor = currentServer(); winnerOfPoint = opp(actor); break;
+      case "returnWinner": actor = opp(currentServer()); winnerOfPoint = actor; break;
+      case "winner": actor = actorPlayer; winnerOfPoint = actorPlayer; break;
+      case "forced": actor = actorPlayer; winnerOfPoint = opp(actorPlayer); break;
+      case "unforced": actor = actorPlayer; winnerOfPoint = opp(actorPlayer); break;
+      case "fhForced": actor = actorPlayer; winnerOfPoint = opp(actorPlayer); break;
+      case "bhForced": actor = actorPlayer; winnerOfPoint = opp(actorPlayer); break;
+      case "fhUnforced": actor = actorPlayer; winnerOfPoint = opp(actorPlayer); break;
+      case "bhUnforced": actor = actorPlayer; winnerOfPoint = opp(actorPlayer); break;
+      case "fhWinner": actor = actorPlayer; winnerOfPoint = actorPlayer; break;
+      case "bhWinner": actor = actorPlayer; winnerOfPoint = actorPlayer; break;
+      case "overrule": actor = actorPlayer; winnerOfPoint = actorPlayer; break; // point awarded directly, not a shot-quality event
+    }
+
+    S.stats[actor][type]++;
+    S.stats[winnerOfPoint].points++;
+
+    var scoreBefore = formatPointScore();
+
+    S.log.push({
+      type:type, actor:actor, winner:winnerOfPoint,
+      label: TYPE_LABEL[type],
+      before: scoreBefore
+    });
+
+    if(S.inTB){
+      S.tbPointsPlayed++;
+      if(winnerOfPoint==="A") S.tbA++; else S.tbB++;
+      checkTiebreakWin();
+    } else {
+      if(winnerOfPoint==="A") S.ptsA++; else S.ptsB++;
+      checkGameWin();
+    }
+
+    render();
+  }
+
+  function checkGameWin(){
+    var a=S.ptsA, b=S.ptsB;
+    var margin = Math.abs(a-b);
+    var win = S.noAd
+      ? (Math.max(a,b)>=4 && (margin>=2 || Math.min(a,b)===3))  // sudden point at 3-3
+      : (Math.max(a,b)>=4 && margin>=2);
+    if(win) awardGame(a>b?"A":"B");
+  }
+
+  function awardGame(winner){
+    S.ptsA=0; S.ptsB=0;
+    if(winner==="A") S.gamesA++; else S.gamesB++;
+    S.gameBoundaries.push({pointIndex:S.log.length, gA:S.gamesA, gB:S.gamesB, winner:winner, setIndex:S.completedSets.length});
+    S.server = opp(S.server);
+    checkSetWin();
+  }
+
+  function checkSetWin(){
+    var a=S.gamesA, b=S.gamesB;
+    var G = S.gamesPerSet;
+    var tbAt = S.tbEarly ? (G-1) : G;
+    if(a===tbAt && b===tbAt){
+      S.inTB=true; S.tbA=0; S.tbB=0; S.tbPointsPlayed=0;
+      S.tbStartServer = S.server; // whoever is "up" to serve next game serves first tb point
+      return;
+    }
+    if(Math.max(a,b)>=G && Math.abs(a-b)>=2){
+      awardSet(a>b?"A":"B", false);
+    }
+  }
+
+  function checkTiebreakWin(){
+    var a=S.tbA, b=S.tbB;
+    if(Math.max(a,b)>=7 && Math.abs(a-b)>=2){
+      var w = a>b?"A":"B";
+      var G = S.gamesPerSet;
+      var tbAt = S.tbEarly ? (G-1) : G;
+      // record set score as the tiebreak-set score (loser's games = the TB-trigger count, winner = +1)
+      if(w==="A"){ S.gamesA = tbAt+1; S.gamesB = tbAt; }
+      else       { S.gamesB = tbAt+1; S.gamesA = tbAt; }
+      awardSet(w, true, {a:S.tbA,b:S.tbB});
+    }
+  }
+
+  function awardSet(winner, wasTB, tbScore){
+    S.completedSets.push({a:S.gamesA, b:S.gamesB, tb: wasTB?tbScore:null});
+    if(winner==="A") S.setWinsA++; else S.setWinsB++;
+    S.gamesA=0; S.gamesB=0; S.ptsA=0; S.ptsB=0;
+    if(S.inTB){
+      // player who received first tb point serves first game of next set
+      S.server = opp(S.tbStartServer);
+    }
+    S.inTB=false; S.tbA=0; S.tbB=0; S.tbPointsPlayed=0; S.tbStartServer=null;
+
+    if(S.setWinsA===S.setsToWin || S.setWinsB===S.setsToWin){
+      S.matchOver=true;
+      S.winner=winner;
+    }
+  }
+
+  function undo(){
+    if(history.length===0) return;
+    S = history.pop();
+    render();
+  }
+
+  function pointLabel(n, other){
+    var LBL=["0","15","30","40"];
+    if(n<=3 && !(n===3 && other===3)) return LBL[n];
+    return null; // handled by deuce logic
+  }
+
+  function formatPointScore(){
+    if(S.inTB) return "TB " + S.tbA + "–" + S.tbB;
+    var a=S.ptsA, b=S.ptsB;
+    if(a>=3 && b>=3){
+      if(a===b) return "Deuce";
+      return (a>b ? S.names.A : S.names.B) + " Ad";
+    }
+    var LBL=["0","15","30","40"];
+    return LBL[a]+"–"+LBL[b];
+  }
+
+  function render(){
+    document.getElementById("sbNameA").textContent = S.names.A;
+    document.getElementById("sbNameB").textContent = S.names.B;
+    document.getElementById("colNameA").textContent = S.names.A;
+    document.getElementById("colNameB").textContent = S.names.B;
+    document.getElementById("stA").textContent = S.names.A;
+    document.getElementById("stB").textContent = S.names.B;
+
+    document.getElementById("setsA").textContent = S.setWinsA;
+    document.getElementById("setsB").textContent = S.setWinsB;
+    document.getElementById("gamesA").textContent = S.gamesA;
+    document.getElementById("gamesB").textContent = S.gamesB;
+
+    var srv = S.matchOver ? null : currentServer();
+    document.getElementById("dotA").classList.toggle("on", srv==="A");
+    document.getElementById("dotB").classList.toggle("on", srv==="B");
+
+    if(S.inTB){
+      document.getElementById("ptsA").textContent = S.tbA;
+      document.getElementById("ptsB").textContent = S.tbB;
+      document.getElementById("tbTag").textContent = "TIEBREAK";
+    } else {
+      var a=S.ptsA, b=S.ptsB, LBL=["0","15","30","40"];
+      var la, lb;
+      if(a>=3 && b>=3){
+        if(a===b){ la="40"; lb="40"; }
+        else if(a>b){ la="Ad"; lb=""; }
+        else { la=""; lb="Ad"; }
+      } else { la=LBL[a]; lb=LBL[b]; }
+      document.getElementById("ptsA").textContent = la;
+      document.getElementById("ptsB").textContent = lb;
+      document.getElementById("tbTag").textContent = (a>=3&&b>=3&&a===b) ? (S.noAd ? "DECIDING POINT" : "DEUCE") : "";
+    }
+
+    // serve block heading + enable state
+    document.getElementById("serveHeading").textContent =
+      S.matchOver ? "Serve" : "Serve — " + S.names[srv];
+    document.getElementById("btnReturnWinner").querySelector("small").textContent =
+      S.matchOver ? "" : S.names[opp(srv)] + " wins";
+
+    document.querySelectorAll("#noAdSeg button").forEach(function(b){
+      b.classList.toggle("active", (b.dataset.v==="noad") === !!S.noAd);
+    });
+
+    document.getElementById("formatTag").textContent = S.matchFormat==="custom"
+      ? ("Race to " + S.setsToWin + " sets · sets to " + S.gamesPerSet + ", TB at " + (S.gamesPerSet-1) + "-" + (S.gamesPerSet-1))
+      : ("Best of " + S.bestOf + " sets");
+
+    // banner
+    var banner = document.getElementById("banner");
+    if(S.matchOver){
+      banner.classList.add("show");
+      document.getElementById("bannerTitle").textContent = S.names[S.winner] + " wins the match";
+      document.getElementById("bannerSub").textContent = setsSummary();
+      setControlsEnabled(false);
+    } else {
+      banner.classList.remove("show");
+      setControlsEnabled(true);
+    }
+
+    document.getElementById("ovLabelA").textContent = "→ "+S.names.A+" pt";
+    document.getElementById("ovLabelB").textContent = "→ "+S.names.B+" pt";
+
+    // stats table
+    ["ace","df","returnWinner","winner","forced","unforced","overrule",
+     "fhForced","bhForced","fhUnforced","bhUnforced","fhWinner","bhWinner"].forEach(function(k){
+      document.getElementById("s_"+k+"_A").textContent = S.stats.A[k];
+      document.getElementById("s_"+k+"_B").textContent = S.stats.B[k];
+    });
+    document.getElementById("s_points_A").innerHTML = "<b>"+S.stats.A.points+"</b>";
+    document.getElementById("s_points_B").innerHTML = "<b>"+S.stats.B.points+"</b>";
+
+    document.getElementById("undoBtn").disabled = history.length===0;
+
+    renderLog();
+    drawGrowthChart();
+    drawGameChart();
+    drawShareChart();
+    drawBarChart();
+  }
+
+  function drawGrowthChart(){
+    var el = document.getElementById("growthChart");
+    var leg = document.getElementById("growthLegend");
+    var log = S.log;
+    if(log.length===0){
+      el.innerHTML = '<div style="padding:22px;text-align:center;color:#aba898;font-size:12.5px;">No points yet — the growth line fills in as you score.</div>';
+      leg.innerHTML = "";
+      return;
+    }
+    var w=600, h=190, padL=30, padR=14, padT=14, padB=22;
+    var n = log.length;
+    var cumA=[0], cumB=[0], a=0, b=0;
+    log.forEach(function(e){ if(e.winner==="A") a++; else b++; cumA.push(a); cumB.push(b); });
+    var maxY = Math.max(a, b, 1);
+    function x(i){ return padL + (n<=1 ? 0 : (i/n)*(w-padL-padR)); }
+    function y(v){ return (h-padB) - (v/maxY)*(h-padT-padB); }
+    function path(arr){
+      return arr.map(function(v,i){ return (i===0?"M":"L")+x(i).toFixed(1)+","+y(v).toFixed(1); }).join(" ");
+    }
+    var gridLines = "";
+    var steps = 4;
+    for(var s=0;s<=steps;s++){
+      var gy = padT + (s/steps)*(h-padT-padB);
+      var val = Math.round(maxY - (s/steps)*maxY);
+      gridLines += '<line x1="'+padL+'" y1="'+gy.toFixed(1)+'" x2="'+(w-padR)+'" y2="'+gy.toFixed(1)+'" stroke="#EDEAE1" stroke-width="1"/>';
+      gridLines += '<text x="'+(padL-6)+'" y="'+(gy+3).toFixed(1)+'" font-size="9" fill="#aba898" text-anchor="end">'+val+'</text>';
+    }
+    var boundaryMarks = "";
+    S.gameBoundaries.forEach(function(g){
+      var gx = x(g.pointIndex);
+      boundaryMarks += '<line x1="'+gx.toFixed(1)+'" y1="'+padT+'" x2="'+gx.toFixed(1)+'" y2="'+(h-padB)+'" stroke="#EDEAE1" stroke-width="1" stroke-dasharray="2,3"/>';
+    });
+    var lastAx=x(cumA.length-1), lastAy=y(cumA[cumA.length-1]);
+    var lastBx=x(cumB.length-1), lastBy=y(cumB[cumB.length-1]);
+    var svg = '<svg viewBox="0 0 '+w+' '+h+'" style="width:100%;height:auto;display:block;" preserveAspectRatio="none">'+
+      gridLines + boundaryMarks +
+      '<line x1="'+padL+'" y1="'+(h-padB)+'" x2="'+(w-padR)+'" y2="'+(h-padB)+'" stroke="#DEDAD0" stroke-width="1.2"/>'+
+      '<path d="'+path(cumB)+'" fill="none" stroke="#B5622A" stroke-width="2.4"/>'+
+      '<path d="'+path(cumA)+'" fill="none" stroke="#2E5C8A" stroke-width="2.4"/>'+
+      '<circle cx="'+lastAx.toFixed(1)+'" cy="'+lastAy.toFixed(1)+'" r="3.2" fill="#2E5C8A"/>'+
+      '<circle cx="'+lastBx.toFixed(1)+'" cy="'+lastBy.toFixed(1)+'" r="3.2" fill="#B5622A"/>'+
+      '</svg>';
+    el.innerHTML = svg;
+    leg.innerHTML =
+      '<span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#2E5C8A;margin-right:5px;"></span>'+S.names.A+' — '+a+' pts</span>'+
+      '<span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#B5622A;margin-right:5px;"></span>'+S.names.B+' — '+b+' pts</span>';
+  }
+
+  function drawGameChart(){
+    var el = document.getElementById("gameChart");
+    if(S.gameBoundaries.length===0){
+      el.innerHTML = '<div style="padding:16px;text-align:center;color:#aba898;font-size:12.5px;">No completed games yet.</div>';
+      return;
+    }
+    var bySet = {};
+    S.gameBoundaries.forEach(function(g){
+      if(!bySet[g.setIndex]) bySet[g.setIndex]=[];
+      bySet[g.setIndex].push(g);
+    });
+    var setIndices = Object.keys(bySet).map(Number).sort(function(a,b){return a-b;});
+    var html = "";
+    setIndices.forEach(function(si){
+      var arr = bySet[si];
+      var last = arr[arr.length-1];
+      html += '<div style="margin-bottom:'+(si<setIndices.length-1?10:0)+'px;">';
+      html += '<div style="font-size:11px;color:#8a887f;margin-bottom:5px;">Set '+(si+1)+
+              '<span style="float:right;font-weight:700;color:var(--ink);">'+last.gA+'\u2013'+last.gB+'</span></div>';
+      html += '<div style="display:flex;gap:5px;flex-wrap:wrap;">';
+      arr.forEach(function(g, gi){
+        var color = g.winner==="A" ? "#2E5C8A" : "#B5622A";
+        html += '<div title="Game '+(gi+1)+': '+g.gA+'\u2013'+g.gB+'" style="width:24px;height:24px;border-radius:6px;background:'+color+
+                ';color:#fff;font-size:10.5px;display:flex;align-items:center;justify-content:center;font-weight:700;">'+(gi+1)+'</div>';
+      });
+      html += '</div></div>';
+    });
+    el.innerHTML = html;
+  }
+
+  function drawShareChart(){
+    var el = document.getElementById("shareChart");
+    var totalA = S.stats.A.points, totalB = S.stats.B.points;
+    var total = totalA + totalB;
+    if(total===0){
+      el.innerHTML = '<div style="padding:16px;color:#aba898;font-size:12.5px;">No points yet.</div>';
+      return;
+    }
+    var pctA = totalA/total;
+    var r=40, circ=2*Math.PI*r;
+    var offsetA = circ*(1-pctA);
+    var svg = '<svg width="110" height="110" viewBox="0 0 110 110">'+
+      '<circle cx="55" cy="55" r="'+r+'" fill="none" stroke="#B5622A" stroke-width="14"/>'+
+      '<circle cx="55" cy="55" r="'+r+'" fill="none" stroke="#2E5C8A" stroke-width="14" '+
+        'stroke-dasharray="'+circ.toFixed(1)+'" stroke-dashoffset="'+offsetA.toFixed(1)+'" '+
+        'transform="rotate(-90 55 55)" stroke-linecap="butt"/>'+
+      '<text x="55" y="59" text-anchor="middle" font-size="20" font-weight="700" fill="#12201A">'+Math.round(pctA*100)+'%</text>'+
+      '</svg>';
+    var legend = '<div style="font-size:12.5px;line-height:1.9;">'+
+      '<div><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#2E5C8A;margin-right:6px;"></span>'+S.names.A+': <b>'+totalA+'</b></div>'+
+      '<div><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#B5622A;margin-right:6px;"></span>'+S.names.B+': <b>'+totalB+'</b></div>'+
+      '<div style="color:#8a887f;margin-top:2px;">'+total+' total points</div>'+
+      '</div>';
+    el.innerHTML = svg + legend;
+  }
+
+  function drawBarChart(){
+    var el = document.getElementById("barChart");
+    var cats = [
+      {k:"fhWinner", label:"FH winner"},
+      {k:"bhWinner", label:"BH winner"},
+      {k:"returnWinner", label:"Return winners"},
+      {k:"ace", label:"Aces"},
+      {k:"fhForced", label:"FH forced err"},
+      {k:"bhForced", label:"BH forced err"},
+      {k:"fhUnforced", label:"FH unforced err"},
+      {k:"bhUnforced", label:"BH unforced err"},
+      {k:"df", label:"Double faults"}
+    ];
+    var maxVal = 1;
+    cats.forEach(function(c){ maxVal = Math.max(maxVal, S.stats.A[c.k], S.stats.B[c.k]); });
+    var rowH = 30;
+    var w = 600, h = cats.length*rowH + 10;
+    var labelW = 108, barMaxW = w - labelW - 70;
+    var rows = "";
+    cats.forEach(function(c, idx){
+      var y0 = idx*rowH + 6;
+      var av = S.stats.A[c.k], bv = S.stats.B[c.k];
+      var aw = (av/maxVal)*barMaxW, bw = (bv/maxVal)*barMaxW;
+      rows += '<text x="0" y="'+(y0+9)+'" font-size="11" fill="#4a4940">'+c.label+'</text>';
+      rows += '<rect x="'+labelW+'" y="'+y0+'" width="'+aw.toFixed(1)+'" height="9" rx="2" fill="#2E5C8A"/>';
+      rows += '<text x="'+(labelW+aw+6)+'" y="'+(y0+8)+'" font-size="10" fill="#2E5C8A" font-weight="700">'+av+'</text>';
+      rows += '<rect x="'+labelW+'" y="'+(y0+12)+'" width="'+bw.toFixed(1)+'" height="9" rx="2" fill="#B5622A"/>';
+      rows += '<text x="'+(labelW+bw+6)+'" y="'+(y0+20)+'" font-size="10" fill="#B5622A" font-weight="700">'+bv+'</text>';
+    });
+    el.innerHTML = '<svg viewBox="0 0 '+w+' '+h+'" style="width:100%;height:auto;display:block;">'+rows+'</svg>';
+  }
+
+  function setsSummary(){
+    return S.completedSets.map(function(s){
+      var str = s.a+"–"+s.b;
+      if(s.tb) str += "("+Math.min(s.tb.a,s.tb.b)+")";
+      return str;
+    }).join(", ");
+  }
+
+  function setControlsEnabled(on){
+    var btns = document.querySelectorAll("#serveBlock button, .pcol button, #btnOverruleA, #btnOverruleB");
+    btns.forEach(function(b){ b.disabled = !on; b.style.opacity = on?"1":".4"; });
+  }
+
+  function renderLog(){
+    var el = document.getElementById("log");
+    if(S.log.length===0){
+      el.innerHTML = '<div class="empty">No points yet</div>';
+      return;
+    }
+    var html = "";
+    for(var i=S.log.length-1;i>=0;i--){
+      var e = S.log[i];
+      html += '<div class="row '+e.winner.toLowerCase()+'">'+
+              '<span><span class="who">'+S.names[e.actor]+'</span> — '+e.label+'</span>'+
+              '<span>'+e.before+'</span></div>';
+    }
+    el.innerHTML = html;
+  }
+
+  // ---------- sample match (reconstructed from user's Sunlight vs Opponent notes) ----------
+  // Server alternates A,B,A,B... starting with A (Sunlight) — this is the only rotation
+  // consistent with every ace/double-fault entry in the raw notes without contradiction.
+  // Game 1's "opponent serve point" therefore falls in Sunlight's service game, so it is
+  // read as a return winner for the opponent, not an ace.
+  var SAMPLE_MATCH = [
+    // Game 1 — Opponent 4-0
+    {t:"unforced",p:"A"},{t:"unforced",p:"A"},{t:"unforced",p:"A"},{t:"returnWinner"},
+    // Game 2 — Sunlight 4-1
+    {t:"unforced",p:"B"},{t:"winner",p:"A"},{t:"forced",p:"A"},{t:"unforced",p:"B"},{t:"forced",p:"B"},
+    // Game 3 — Sunlight 4-2
+    {t:"ace"},{t:"winner",p:"B"},{t:"winner",p:"A"},{t:"unforced",p:"B"},{t:"df"},{t:"unforced",p:"B"},
+    // Game 4 — Sunlight 4-3 (No-Ad / sudden point at 3-3)
+    {t:"__noadon"},
+    {t:"unforced",p:"A"},{t:"unforced",p:"B"},{t:"winner",p:"A"},{t:"unforced",p:"A"},{t:"forced",p:"A"},{t:"unforced",p:"B"},{t:"winner",p:"A"},
+    {t:"__noadoff"},
+    // Game 5 — Sunlight 4-1
+    {t:"ace"},{t:"ace"},{t:"unforced",p:"B"},{t:"df"},{t:"unforced",p:"B"},
+    // Game 6 — Opponent 4-2
+    {t:"unforced",p:"A"},{t:"unforced",p:"B"},{t:"overrule",p:"B"},{t:"winner",p:"B"},{t:"forced",p:"B"},{t:"unforced",p:"A"},
+    // Game 7 — Sunlight 4-2
+    {t:"unforced",p:"A"},{t:"unforced",p:"A"},{t:"forced",p:"B"},{t:"winner",p:"A"},{t:"unforced",p:"B"},{t:"forced",p:"B"},
+    // Game 8 — Opponent 4-1
+    {t:"overrule",p:"B"},{t:"forced",p:"A"},{t:"unforced",p:"A"},{t:"forced",p:"B"},{t:"winner",p:"B"},
+    // Game 9 — Opponent 4-2
+    {t:"overrule",p:"B"},{t:"forced",p:"A"},{t:"forced",p:"B"},{t:"winner",p:"B"},{t:"unforced",p:"B"},{t:"unforced",p:"A"},
+    // Game 10 — Sunlight 4-1 (Sunlight wins Set 1, 6 games to 4)
+    {t:"unforced",p:"B"},{t:"winner",p:"A"},{t:"forced",p:"A"},{t:"forced",p:"B"},{t:"unforced",p:"B"}
+  ];
+
+  document.getElementById("loadSampleBtn").addEventListener("click", function(){
+    S = newMatch("Sunlight", "Opponent", {matchFormat:"standard", bestOf:3, firstServer:"A"});
+    history = [];
+    SAMPLE_MATCH.forEach(function(step){
+      if(step.t==="__noadon"){ S.noAd = true; return; }
+      if(step.t==="__noadoff"){ S.noAd = false; return; }
+      recordPoint(step.t, step.p);
+    });
+    document.getElementById("setup").style.display = "none";
+    document.getElementById("match").style.display = "block";
+    render();
+  });
+
+  // ---------- setup screen wiring ----------
+  var chosenFormat = 3, chosenServer = "A", chosenMatchFormat = "standard";
+
+  document.getElementById("matchFormatSeg").addEventListener("click", function(e){
+    var b = e.target.closest("button"); if(!b) return;
+    this.querySelectorAll("button").forEach(function(x){x.classList.remove("active");});
+    b.classList.add("active");
+    chosenMatchFormat = b.dataset.v;
+    document.getElementById("standardFields").style.display = chosenMatchFormat==="standard" ? "block" : "none";
+    document.getElementById("customFields").style.display = chosenMatchFormat==="custom" ? "block" : "none";
+  });
+
+  document.getElementById("gamesPerSet").addEventListener("input", function(){
+    var g = parseInt(this.value,10);
+    if(!g || g<2) g = 6;
+    document.getElementById("tbNote").textContent = "Tiebreak triggers at " + (g-1) + "–" + (g-1) + ".";
+  });
+
+  document.getElementById("formatSeg").addEventListener("click", function(e){
+    var b = e.target.closest("button"); if(!b) return;
+    this.querySelectorAll("button").forEach(function(x){x.classList.remove("active");});
+    b.classList.add("active");
+    chosenFormat = parseInt(b.dataset.v,10);
+  });
+  document.getElementById("serverSeg").addEventListener("click", function(e){
+    var b = e.target.closest("button"); if(!b) return;
+    this.querySelectorAll("button").forEach(function(x){x.classList.remove("active");});
+    b.classList.add("active");
+    chosenServer = b.dataset.v;
+  });
+
+  document.getElementById("startBtn").addEventListener("click", function(){
+    var nameA = document.getElementById("nameA").value.trim() || "Player A";
+    var nameB = document.getElementById("nameB").value.trim() || "Player B";
+    var opts = { matchFormat: chosenMatchFormat, bestOf: chosenFormat, firstServer: chosenServer };
+    if(chosenMatchFormat==="custom"){
+      var g = parseInt(document.getElementById("gamesPerSet").value,10);
+      var st = parseInt(document.getElementById("setsToWin").value,10);
+      opts.gamesPerSet = (g && g>=2) ? g : 6;
+      opts.setsToWin = (st && st>=1) ? st : 6;
+    }
+    S = newMatch(nameA, nameB, opts);
+    history = [];
+    document.getElementById("noAdSeg").querySelectorAll("button").forEach(function(x){x.classList.remove("active");});
+    document.getElementById("noAdSeg").querySelector('[data-v="ad"]').classList.add("active");
+    document.getElementById("setup").style.display = "none";
+    document.getElementById("match").style.display = "block";
+    render();
+  });
+
+  // ---------- match screen wiring ----------
+  document.getElementById("btnAce").addEventListener("click", function(){ recordPoint("ace"); });
+  document.getElementById("btnDF").addEventListener("click", function(){ recordPoint("df"); });
+  document.getElementById("btnReturnWinner").addEventListener("click", function(){ recordPoint("returnWinner"); });
+
+  document.querySelectorAll(".pcol button").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      recordPoint(btn.dataset.t, btn.dataset.p);
+    });
+  });
+
+  document.getElementById("noAdSeg").addEventListener("click", function(e){
+    var b = e.target.closest("button"); if(!b || !S) return;
+    this.querySelectorAll("button").forEach(function(x){x.classList.remove("active");});
+    b.classList.add("active");
+    S.noAd = (b.dataset.v === "noad");
+    render();
+  });
+
+  document.getElementById("btnOverruleA").addEventListener("click", function(){ recordPoint("overrule","A"); });
+  document.getElementById("btnOverruleB").addEventListener("click", function(){ recordPoint("overrule","B"); });
+
+  document.getElementById("undoBtn").addEventListener("click", undo);
+  document.getElementById("resetBtn").addEventListener("click", function(){
+    if(S && S.log.length>0){
+      if(!confirm("Start a new match? Current match data will be lost.")) return;
+    }
+    document.getElementById("match").style.display = "none";
+    document.getElementById("setup").style.display = "block";
+  });
+
+})();
+</script>
+</body>
+</html>
