@@ -1,192 +1,320 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Match Tracker">
-<meta name="theme-color" content="#1B4332">
-<link rel="apple-touch-icon" href="data:image/png;base64,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">
-<title>Match Tracker</title>
-<style>
-  :root{
-    --ink:#12201A;
-    --paper:#F7F6F2;
-    --court:#1B4332;
-    --court-line:#EDEAE1;
-    --a:#2E5C8A;
-    --a-soft:#E7EEF5;
-    --b:#B5622A;
-    --b-soft:#F6E9DE;
-    --win:#2E7D4F;
-    --err:#B23A3A;
-    --line:#DEDAD0;
-    --radius:10px;
-  }
-  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-  html,body{height:100%;}
-  body{
-    margin:0;
-    background:var(--paper);
-    color:var(--ink);
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    padding-top:env(safe-area-inset-top,0px);
-    padding-bottom:env(safe-area-inset-bottom,0px);
-  }
-  .app{max-width:520px;margin:0 auto;padding:0 14px 40px;}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Match Tracker">
+  <meta name="theme-color" content="#1B4332">
+  <title>Match Tracker — simplified</title>
+  <style>
+    :root{
+      --ink:#12201A;
+      --paper:#F7F6F2;
+      --court:#1B4332;
+      --a:#2E5C8A;
+      --a-soft:#E7EEF5;
+      --b:#B5622A;
+      --b-soft:#F6E9DE;
+      --win:#2E7D4F;
+      --err:#B23A3A;
+      --line:#DEDAD0;
+      --radius:10px;
+    }
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+    html,body{height:100%;}
+    body{
+      margin:0;
+      background:var(--paper);
+      color:var(--ink);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      padding-top:env(safe-area-inset-top,0px);
+      padding-bottom:env(safe-area-inset-bottom,0px);
+    }
+    .app{max-width:520px;margin:0 auto;padding:0 14px 40px;}
 
-  /* ---------- Setup screen ---------- */
-  #setup{padding:28px 14px;max-width:420px;margin:0 auto;}
-  #setup h1{font-size:22px;margin:0 0 4px;letter-spacing:-0.01em;}
-  #setup p.sub{margin:0 0 24px;color:#6b6a63;font-size:14px;line-height:1.5;}
-  .field{margin-bottom:18px;}
-  .field label{display:block;font-size:12.5px;color:#6b6a63;margin-bottom:6px;}
-  .field input[type=text]{
-    width:100%;padding:12px 12px;border:1.5px solid var(--line);border-radius:var(--radius);
-    font-size:16px;background:#fff;color:var(--ink);
-  }
-  .seg{display:flex;border:1.5px solid var(--line);border-radius:var(--radius);overflow:hidden;}
-  .seg button{
-    flex:1;padding:11px 8px;border:none;background:#fff;font-size:14px;color:var(--ink);
-    border-right:1.5px solid var(--line);
-  }
-  .seg button:last-child{border-right:none;}
-  .seg button.active{background:var(--court);color:#fff;}
-  #noAdSeg button{font-size:12.5px;padding:10px 6px;}
-  #startBtn{
-    width:100%;margin-top:8px;padding:15px;border:none;border-radius:var(--radius);
-    background:var(--court);color:#fff;font-size:16px;font-weight:600;
-  }
-  #startBtn:active{opacity:.85;}
+    /* ---------- HOME (simplified front page) ---------- */
+    #home{padding:28px 14px;max-width:420px;margin:0 auto;}
+    #home h1{font-size:22px;margin:0 0 4px;letter-spacing:-0.01em;}
+    #home p.sub{margin:0 0 24px;color:#6b6a63;font-size:14px;line-height:1.5;}
 
-  /* ---------- Match screen ---------- */
-  #match{display:none;}
-  header.scoreboard{
-    background:var(--court);color:#fff;border-radius:var(--radius);
-    padding:14px 16px;margin:12px 0 14px;
-  }
-  .sb-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;}
-  .sb-row + .sb-row{border-top:1px solid rgba(255,255,255,.14);}
-  .sb-name{display:flex;align-items:center;gap:8px;font-size:15.5px;font-weight:600;min-width:0;}
-  .sb-name .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:120px;}
-  .serve-dot{width:7px;height:7px;border-radius:50%;background:#F4C542;flex:none;visibility:hidden;}
-  .serve-dot.on{visibility:visible;}
-  .sb-nums{display:flex;gap:14px;align-items:baseline;font-variant-numeric:tabular-nums;}
-  .sb-nums .sets{font-size:14px;opacity:.75;min-width:14px;text-align:center;}
-  .sb-nums .games{font-size:17px;opacity:.9;min-width:16px;text-align:center;}
-  .sb-nums .pts{font-size:24px;font-weight:700;min-width:34px;text-align:center;}
-  .tb-tag{font-size:10.5px;opacity:.75;letter-spacing:.02em;margin-top:2px;text-align:right;}
+    .big-block{
+      background:#fff;
+      border:1.5px solid var(--line);
+      border-radius:var(--radius);
+      padding:16px 16px;
+      margin-bottom:16px;
+    }
+    .big-block .datetime-row{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    .big-block .datetime-row label{
+      font-size:12.5px;
+      color:#6b6a63;
+      font-weight:600;
+      min-width:40px;
+    }
+    .big-block input[type=date],
+    .big-block input[type=time]{
+      flex:1;
+      padding:11px 10px;
+      border:1.5px solid var(--line);
+      border-radius:8px;
+      font-size:15px;
+      background:var(--paper);
+      color:var(--ink);
+      min-width:120px;
+    }
+    .big-block .preview{
+      font-size:13px;
+      color:#6b6a63;
+      margin-top:8px;
+      display:flex;
+      justify-content:space-between;
+    }
 
-  .banner{
-    display:none;background:#fff;border:1.5px solid var(--line);border-radius:var(--radius);
-    padding:14px;margin-bottom:14px;text-align:center;font-size:15px;
-  }
-  .banner.show{display:block;}
-  .banner b{display:block;font-size:17px;margin-bottom:2px;}
+    .home-actions{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .home-actions button{
+      width:100%;
+      padding:16px;
+      border-radius:var(--radius);
+      font-size:16px;
+      font-weight:600;
+      border:none;
+      cursor:pointer;
+    }
+    #homeNewMatchBtn{
+      background:var(--court);
+      color:#fff;
+    }
+    #homeNewMatchBtn:active{opacity:.85;}
+    #homeLibraryBtn{
+      background:#fff;
+      color:var(--court);
+      border:1.5px solid var(--court);
+    }
+    #homeLibraryBtn:active{background:#E7EEF5;}
+    .home-note{
+      margin-top:18px;
+      font-size:12.5px;
+      color:#8a887f;
+      text-align:center;
+      line-height:1.5;
+    }
 
-  section.block{margin-bottom:16px;}
-  section.block h2{
-    font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:#8a887f;
-    margin:0 0 8px;font-weight:600;
-  }
-  .serve-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
-  .serve-grid button{
-    padding:13px 6px;border-radius:var(--radius);border:1.5px solid var(--line);
-    background:#fff;font-size:13px;font-weight:600;color:var(--ink);line-height:1.25;
-  }
-  .serve-grid button small{display:block;font-weight:400;color:#8a887f;font-size:11px;margin-top:2px;}
-  .serve-grid button:active{transform:scale(.97);}
-  .serve-grid button.ace{border-color:var(--win);color:var(--win);}
-  .serve-grid button.df{border-color:var(--err);color:var(--err);}
+    /* ---------- SETUP (new match form) ---------- */
+    #setup{padding:20px 14px;max-width:420px;margin:0 auto;display:none;}
+    #setup h2{font-size:18px;margin:0 0 4px;}
+    #setup p.sub{margin:0 0 20px;color:#6b6a63;font-size:13.5px;line-height:1.5;}
+    .field{margin-bottom:16px;}
+    .field label{display:block;font-size:12.5px;color:#6b6a63;margin-bottom:6px;}
+    .field input[type=text]{
+      width:100%;padding:12px;border:1.5px solid var(--line);border-radius:var(--radius);
+      font-size:16px;background:#fff;color:var(--ink);
+    }
+    .seg{display:flex;border:1.5px solid var(--line);border-radius:var(--radius);overflow:hidden;}
+    .seg button{
+      flex:1;padding:11px 8px;border:none;background:#fff;font-size:14px;color:var(--ink);
+      border-right:1.5px solid var(--line);
+    }
+    .seg button:last-child{border-right:none;}
+    .seg button.active{background:var(--court);color:#fff;}
+    #startBtn{
+      width:100%;margin-top:8px;padding:15px;border:none;border-radius:var(--radius);
+      background:var(--court);color:#fff;font-size:16px;font-weight:600;
+    }
+    #startBtn:active{opacity:.85;}
+    .back-link{
+      display:inline-block;
+      margin-bottom:12px;
+      font-size:13.5px;
+      color:var(--a);
+      text-decoration:none;
+      font-weight:600;
+      cursor:pointer;
+    }
+    .back-link:active{opacity:.6;}
 
-  .player-cols{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-  .pcol{border:1.5px solid var(--line);border-radius:var(--radius);padding:10px;background:#fff;}
-  .pcol .ptitle{font-size:13px;font-weight:700;margin-bottom:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-  .pcol.A .ptitle{color:var(--a);}
-  .pcol.B .ptitle{color:var(--b);}
-  .pcol button{
-    width:100%;text-align:left;padding:10px 10px;margin-bottom:6px;border-radius:8px;
-    border:1.5px solid var(--line);background:var(--paper);font-size:13.5px;color:var(--ink);font-weight:600;
-  }
-  .pcol button:last-child{margin-bottom:0;}
-  .pcol button:active{transform:scale(.98);}
-  .pcol button.winner{border-color:var(--win);}
-  .pcol button.unforced,.pcol button.forced{border-color:var(--err);}
-  .err-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:2px;}
-  .err-grid button{margin-bottom:0;font-size:11.5px;padding:9px 6px;text-align:center;}
-  .win-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
-  .win-grid button{margin-bottom:0;font-size:11.5px;padding:9px 6px;text-align:center;}
+    /* ---------- LIBRARY ---------- */
+    #library{padding:20px 14px;max-width:420px;margin:0 auto;display:none;}
+    #library .lib-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+    #library .lib-head h2{font-size:18px;margin:0;}
+    #library .lib-head button{
+      padding:8px 14px;border:none;border-radius:8px;background:var(--court);
+      color:#fff;font-size:13px;font-weight:600;
+    }
+    .lib-row{
+      display:flex;justify-content:space-between;align-items:center;gap:10px;
+      background:#fff;border:1.5px solid var(--line);border-radius:var(--radius);
+      padding:12px;margin-bottom:8px;
+    }
+    .lib-row .lib-main{min-width:0;flex:1;cursor:pointer;}
+    .lib-row .lib-title{font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .lib-row .lib-meta{font-size:11.5px;color:#8a887f;margin-top:2px;display:flex;flex-wrap:wrap;gap:5px;}
+    .lib-badge{
+      font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;
+      background:var(--a-soft);color:var(--a);
+    }
+    .lib-badge.done{background:#E4F1E8;color:var(--win);}
+    .lib-row .lib-del{
+      border:none;background:none;color:#B5622A;font-size:18px;padding:4px 6px;flex:none;cursor:pointer;
+    }
+    .lib-empty{text-align:center;color:#aba898;font-size:13px;padding:30px 10px;}
 
-  .util-row{display:flex;gap:10px;margin-top:4px;}
-  .util-row button{
-    flex:1;padding:11px;border-radius:var(--radius);border:1.5px solid var(--line);
-    background:#fff;font-size:13.5px;font-weight:600;color:var(--ink);
-  }
-  .util-row button:disabled{opacity:.35;}
+    /* ---------- MATCH SCREEN ---------- */
+    #match{display:none;}
+    header.scoreboard{
+      background:var(--court);color:#fff;border-radius:var(--radius);
+      padding:14px 16px;margin:12px 0 14px;
+    }
+    .sb-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;}
+    .sb-row + .sb-row{border-top:1px solid rgba(255,255,255,.14);}
+    .sb-name{display:flex;align-items:center;gap:8px;font-size:15.5px;font-weight:600;min-width:0;}
+    .sb-name .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:120px;}
+    .serve-dot{width:7px;height:7px;border-radius:50%;background:#F4C542;flex:none;visibility:hidden;}
+    .serve-dot.on{visibility:visible;}
+    .sb-nums{display:flex;gap:14px;align-items:baseline;font-variant-numeric:tabular-nums;}
+    .sb-nums .sets{font-size:14px;opacity:.75;min-width:14px;text-align:center;}
+    .sb-nums .games{font-size:17px;opacity:.9;min-width:16px;text-align:center;}
+    .sb-nums .pts{font-size:24px;font-weight:700;min-width:34px;text-align:center;}
+    .tb-tag{font-size:10.5px;opacity:.75;letter-spacing:.02em;margin-top:2px;text-align:right;}
 
-  table.stats{width:100%;border-collapse:collapse;font-size:13px;background:#fff;border-radius:var(--radius);overflow:hidden;border:1.5px solid var(--line);}
-  table.stats th,table.stats td{padding:8px 8px;text-align:center;border-bottom:1px solid var(--line);}
-  table.stats th{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:#8a887f;font-weight:600;background:var(--paper);}
-  table.stats td:first-child,table.stats th:first-child{text-align:left;color:#6b6a63;}
-  table.stats tr:last-child td{border-bottom:none;}
-  table.stats td.a{color:var(--a);font-weight:700;}
-  table.stats td.b{color:var(--b);font-weight:700;}
+    .banner{
+      display:none;background:#fff;border:1.5px solid var(--line);border-radius:var(--radius);
+      padding:14px;margin-bottom:14px;text-align:center;font-size:15px;
+    }
+    .banner.show{display:block;}
+    .banner b{display:block;font-size:17px;margin-bottom:2px;}
 
-  #log{max-height:180px;overflow-y:auto;font-size:12.5px;color:#6b6a63;border:1.5px solid var(--line);border-radius:var(--radius);background:#fff;}
-  #log .row{padding:8px 10px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:8px;}
-  #log .row:last-child{border-bottom:none;}
-  #log .row span.who{font-weight:600;}
-  #log .row.a span.who{color:var(--a);}
-  #log .row.b span.who{color:var(--b);}
-  #log .empty{padding:14px;text-align:center;color:#aba898;}
+    section.block{margin-bottom:16px;}
+    section.block h2{
+      font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:#8a887f;
+      margin:0 0 8px;font-weight:600;
+    }
+    .serve-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+    .serve-grid button{
+      padding:13px 6px;border-radius:var(--radius);border:1.5px solid var(--line);
+      background:#fff;font-size:13px;font-weight:600;color:var(--ink);line-height:1.25;
+    }
+    .serve-grid button small{display:block;font-weight:400;color:#8a887f;font-size:11px;margin-top:2px;}
+    .serve-grid button:active{transform:scale(.97);}
+    .serve-grid button.ace{border-color:var(--win);color:var(--win);}
+    .serve-grid button.df{border-color:var(--err);color:var(--err);}
 
-  .lib-row{
-    display:flex;justify-content:space-between;align-items:center;gap:10px;
-    background:#fff;border:1.5px solid var(--line);border-radius:var(--radius);
-    padding:12px 12px;margin-bottom:8px;
-  }
-  .lib-row .lib-main{min-width:0;flex:1;}
-  .lib-row .lib-title{font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-  .lib-row .lib-meta{font-size:11.5px;color:#8a887f;margin-top:2px;}
-  .lib-row .lib-badge{
-    font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;margin-left:6px;
-    background:var(--a-soft);color:var(--a);vertical-align:middle;
-  }
-  .lib-row .lib-badge.done{background:#E4F1E8;color:var(--win);}
-  .lib-row .lib-del{
-    border:none;background:none;color:#B5622A;font-size:18px;padding:4px 6px;flex:none;
-  }
-  .lib-empty{text-align:center;color:#aba898;font-size:13px;padding:30px 10px;}
+    .player-cols{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    .pcol{border:1.5px solid var(--line);border-radius:var(--radius);padding:10px;background:#fff;}
+    .pcol .ptitle{font-size:13px;font-weight:700;margin-bottom:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .pcol.A .ptitle{color:var(--a);}
+    .pcol.B .ptitle{color:var(--b);}
+    .pcol button{
+      width:100%;text-align:left;padding:10px;margin-bottom:6px;border-radius:8px;
+      border:1.5px solid var(--line);background:var(--paper);font-size:13.5px;color:var(--ink);font-weight:600;
+    }
+    .pcol button:last-child{margin-bottom:0;}
+    .pcol button:active{transform:scale(.98);}
+    .pcol button.winner{border-color:var(--win);}
+    .pcol button.unforced,.pcol button.forced{border-color:var(--err);}
+    .err-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:2px;}
+    .err-grid button{margin-bottom:0;font-size:11.5px;padding:9px 6px;text-align:center;}
+    .win-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+    .win-grid button{margin-bottom:0;font-size:11.5px;padding:9px 6px;text-align:center;}
 
-  details{border:1.5px solid var(--line);border-radius:var(--radius);background:#fff;padding:0;}
-  details summary{padding:11px 12px;font-size:12.5px;font-weight:600;color:#6b6a63;list-style:none;display:flex;justify-content:space-between;cursor:pointer;}
-  details summary::-webkit-details-marker{display:none;}
-  details summary::after{content:"▾";color:#aba898;}
-  details[open] summary::after{content:"▴";}
-  details .inner{padding:0 12px 12px;}
-</style>
+    .util-row{display:flex;gap:10px;margin-top:4px;}
+    .util-row button{
+      flex:1;padding:11px;border-radius:var(--radius);border:1.5px solid var(--line);
+      background:#fff;font-size:13.5px;font-weight:600;color:var(--ink);
+    }
+    .util-row button:disabled{opacity:.35;}
+
+    table.stats{width:100%;border-collapse:collapse;font-size:13px;background:#fff;border-radius:var(--radius);overflow:hidden;border:1.5px solid var(--line);}
+    table.stats th,table.stats td{padding:8px;text-align:center;border-bottom:1px solid var(--line);}
+    table.stats th{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:#8a887f;font-weight:600;background:var(--paper);}
+    table.stats td:first-child,table.stats th:first-child{text-align:left;color:#6b6a63;}
+    table.stats tr:last-child td{border-bottom:none;}
+    table.stats td.a{color:var(--a);font-weight:700;}
+    table.stats td.b{color:var(--b);font-weight:700;}
+
+    #log{max-height:180px;overflow-y:auto;font-size:12.5px;color:#6b6a63;border:1.5px solid var(--line);border-radius:var(--radius);background:#fff;}
+    #log .row{padding:8px 10px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:8px;}
+    #log .row:last-child{border-bottom:none;}
+    #log .row span.who{font-weight:600;}
+    #log .row.a span.who{color:var(--a);}
+    #log .row.b span.who{color:var(--b);}
+    #log .empty{padding:14px;text-align:center;color:#aba898;}
+
+    details{border:1.5px solid var(--line);border-radius:var(--radius);background:#fff;padding:0;}
+    details summary{padding:11px 12px;font-size:12.5px;font-weight:600;color:#6b6a63;list-style:none;display:flex;justify-content:space-between;cursor:pointer;}
+    details summary::-webkit-details-marker{display:none;}
+    details summary::after{content:"▾";color:#aba898;}
+    details[open] summary::after{content:"▴";}
+    details .inner{padding:0 12px 12px;}
+
+    .close-match-block{
+      background:#fff;
+      border:1.5px solid var(--line);
+      border-radius:var(--radius);
+      padding:14px;
+      margin-top:10px;
+      text-align:center;
+    }
+    .close-match-block p{font-size:12.5px;color:#6b6a63;margin:0 0 10px;}
+    #closeMatchBtn{
+      width:100%;padding:13px;border:none;border-radius:var(--radius);
+      background:var(--err);color:#fff;font-size:14.5px;font-weight:600;
+    }
+    #closeMatchBtn:active{opacity:.85;}
+    #closeMatchBtn:disabled{opacity:.4;}
+  </style>
 </head>
 <body>
 
 <div class="app">
 
-  <!-- SETUP -->
-  <div id="setup">
+  <!-- ========== SIMPLE FRONT PAGE ========== -->
+  <div id="home">
     <h1>Match Tracker</h1>
-    <p class="sub">Tracks the score, plus how every point actually ends — winners, forced/unforced errors, aces, return winners, double faults.</p>
+    <p class="sub">Score, shot outcomes, stats, and a match library — all kept on this device.</p>
 
-    <button id="libraryBtn" style="width:100%;margin-bottom:18px;padding:13px;border:1.5px solid var(--court);border-radius:var(--radius);background:#fff;color:var(--court);font-size:14px;font-weight:600;">My matches <span id="libraryCount" style="color:#8a887f;font-weight:400;"></span></button>
+    <!-- datetime as a single block -->
+    <div class="big-block">
+      <div class="datetime-row">
+        <label>📅</label>
+        <input type="date" id="homeDate">
+        <label>⏱</label>
+        <input type="time" id="homeTime">
+      </div>
+      <div class="preview">
+        <span id="homeDatePreview">Today</span>
+        <span id="homeTimePreview">Now</span>
+      </div>
+    </div>
 
-    <div class="field">
-      <label>Match date</label>
-      <input type="date" id="matchDate" style="width:100%;padding:12px;border:1.5px solid var(--line);border-radius:var(--radius);font-size:16px;">
+    <div class="home-actions">
+      <button id="homeNewMatchBtn">+ New match</button>
+      <button id="homeLibraryBtn">📂 My matches <span id="homeLibCount" style="color:#8a887f;font-weight:400;"></span></button>
     </div>
-    <div class="field">
-      <label>Match time</label>
-      <input type="time" id="matchTime" style="width:100%;padding:12px;border:1.5px solid var(--line);border-radius:var(--radius);font-size:16px;">
+
+    <div class="home-note">
+      Datetime above is used as the default for a new match.<br>
+      Already-started matches appear under “My matches”.
     </div>
+  </div>
+
+  <!-- ========== SETUP / NEW MATCH FORM ========== -->
+  <div id="setup">
+    <span class="back-link" id="setupBackLink">← Back to home</span>
+    <h2>New match</h2>
+    <p class="sub">Set players, format, and first server. You can change scoring mid-match.</p>
+
     <div class="field">
       <label>Player A</label>
       <input type="text" id="nameA" placeholder="Player A" maxlength="18">
@@ -225,21 +353,24 @@
     </div>
 
     <button id="startBtn">Start match</button>
-    <button id="importBtn" style="width:100%;margin-top:10px;padding:12px;border:1.5px solid var(--line);border-radius:var(--radius);background:#fff;color:#6b6a63;font-size:13.5px;">Import match file (.json)</button>
-    <input type="file" id="importFile" accept="application/json,.json" style="display:none;">
-    <div id="importStatus" style="margin-top:8px;font-size:12.5px;color:var(--err);"></div>
+    <div style="margin-top:10px;">
+      <button id="importBtn" style="width:100%;padding:12px;border:1.5px solid var(--line);border-radius:var(--radius);background:#fff;color:#6b6a63;font-size:13.5px;">Import match file (.json)</button>
+      <input type="file" id="importFile" accept="application/json,.json" style="display:none;">
+      <div id="importStatus" style="margin-top:8px;font-size:12.5px;color:var(--err);"></div>
+    </div>
   </div>
 
-  <!-- LIBRARY -->
-  <div id="library" style="display:none;padding:20px 14px;max-width:420px;margin:0 auto;">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-      <h1 style="font-size:20px;margin:0;">My matches</h1>
-      <button id="libraryNewBtn" style="padding:9px 14px;border:none;border-radius:8px;background:var(--court);color:#fff;font-size:13px;font-weight:600;">+ New</button>
+  <!-- ========== LIBRARY ========== -->
+  <div id="library">
+    <span class="back-link" id="libraryBackLink">← Back to home</span>
+    <div class="lib-head">
+      <h2>My matches</h2>
+      <button id="libraryNewBtn">+ New</button>
     </div>
     <div id="libraryList"></div>
   </div>
 
-  <!-- MATCH -->
+  <!-- ========== MATCH ========== -->
   <div id="match">
 
     <header class="scoreboard">
@@ -327,6 +458,12 @@
       <button id="copyExportBtn" style="width:100%;margin-top:6px;padding:9px;border:1.5px solid var(--line);border-radius:8px;background:var(--paper);font-size:12.5px;">Copy to clipboard</button>
     </div>
 
+    <!-- CLOSE MATCH -->
+    <div class="close-match-block" id="closeMatchBlock">
+      <p id="closeMatchHint">Finish this match and lock the result into your library.</p>
+      <button id="closeMatchBtn">Close match (finalise)</button>
+    </div>
+
     <section class="block" style="margin-top:16px;">
       <h2>Match stats</h2>
       <table class="stats" id="statsTable">
@@ -392,8 +529,8 @@
     fhWinner:"Forehand winner", bhWinner:"Backhand winner"
   };
 
-  var S = null;      // current match state
-  var history = [];  // stack of previous states for undo
+  var S = null;
+  var history = [];
   var INDEX_KEY = "ttMatches_index_v1";
   var ACTIVE_KEY = "ttActiveMatchId_v1";
 
@@ -425,12 +562,12 @@
   }
   function saveActiveMatch(){
     if(!S) return;
-    if(!S.id) S.id = newId();          // heals any match loaded before the library existed
+    if(!S.id) S.id = newId();
     if(!S.matchTime) S.matchTime = nowTimeStr();
     try{
       localStorage.setItem("ttMatch_"+S.id, JSON.stringify(S));
       localStorage.setItem(ACTIVE_KEY, S.id);
-    }catch(e){ /* storage unavailable — app still works, just won't persist */ }
+    }catch(e){}
     upsertIndexEntry(S);
   }
   function loadMatchById(id){
@@ -457,12 +594,44 @@
     var months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
     return months[parseInt(parts[1],10)-1] + " " + parseInt(parts[2],10) + ", " + parts[0];
   }
+  function fmtTime(t){
+    if(!t) return "";
+    var parts = t.split(":");
+    if(parts.length<2) return t;
+    var h = parseInt(parts[0],10), m = parts[1];
+    var ampm = h>=12 ? "PM" : "AM";
+    var h12 = h % 12; if(h12===0) h12 = 12;
+    return h12+":"+m+" "+ampm;
+  }
+  function todayStr(){
+    var d = new Date();
+    var m = String(d.getMonth()+1).padStart(2,"0");
+    var day = String(d.getDate()).padStart(2,"0");
+    return d.getFullYear()+"-"+m+"-"+day;
+  }
+  function nowTimeStr(){
+    var d = new Date();
+    return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");
+  }
+  function safeFileName(s){
+    return String(s).trim().replace(/[^a-zA-Z0-9_-]+/g,"_").replace(/^_+|_+$/g,"") || "player";
+  }
+  function matchNaturalKey(st){
+    return (st.matchDate||"")+"_"+(st.matchTime||"")+"_"+
+      safeFileName(st.names.A).toLowerCase()+"_"+safeFileName(st.names.B).toLowerCase();
+  }
 
+  function updateHomeCount(){
+    var n = loadIndex().length;
+    var el = document.getElementById("homeLibCount");
+    if(el) el.textContent = n ? ("(" + n + ")") : "";
+  }
+
+  // ---------- RENDER LIBRARY ----------
   function renderLibrary(){
     var list = loadIndex();
     var el = document.getElementById("libraryList");
-    var countEl = document.getElementById("libraryCount");
-    if(countEl) countEl.textContent = list.length ? ("(" + list.length + ")") : "";
+    updateHomeCount();
     if(list.length===0){
       el.innerHTML = '<div class="lib-empty">No saved matches yet — start one, or import a .json file from another device.</div>';
       return;
@@ -477,7 +646,7 @@
       var badge = e.matchOver ? '<span class="lib-badge done">Final</span>' : '<span class="lib-badge">In progress</span>';
       return '<div class="lib-row" data-id="'+e.id+'">'+
         '<div class="lib-main" data-action="open">'+
-          '<div class="lib-title">'+e.nameA+' vs '+e.nameB+badge+'</div>'+
+          '<div class="lib-title">'+e.nameA+' vs '+e.nameB+' '+badge+'</div>'+
           '<div class="lib-meta">'+fmtDate(e.date)+(e.time?' \u00b7 '+fmtTime(e.time):'')+' \u00b7 '+e.summary+'</div>'+
         '</div>'+
         '<button class="lib-del" data-action="delete" title="Delete">\u2715</button>'+
@@ -490,19 +659,49 @@
     if(!m) return;
     S = m;
     history = [];
-    document.getElementById("library").style.display = "none";
+    document.getElementById("home").style.display = "none";
     document.getElementById("setup").style.display = "none";
+    document.getElementById("library").style.display = "none";
     document.getElementById("match").style.display = "block";
     render();
   }
 
-  function updateLibraryBadge(){
-    var n = loadIndex().length;
-    var el = document.getElementById("libraryCount");
-    if(el) el.textContent = n ? ("(" + n + ")") : "";
+  // ---------- SHOW / HIDE SCREENS ----------
+  function showHome(){
+    document.getElementById("home").style.display = "block";
+    document.getElementById("setup").style.display = "none";
+    document.getElementById("library").style.display = "none";
+    document.getElementById("match").style.display = "none";
+    updateHomeCount();
+    // Prefill datetime inputs with current values
+    document.getElementById("homeDate").value = todayStr();
+    document.getElementById("homeTime").value = nowTimeStr();
+    updateHomePreview();
+  }
+  function showSetup(){
+    document.getElementById("home").style.display = "none";
+    document.getElementById("setup").style.display = "block";
+    document.getElementById("library").style.display = "none";
+    document.getElementById("match").style.display = "none";
+  }
+  function showLibrary(){
+    document.getElementById("home").style.display = "none";
+    document.getElementById("setup").style.display = "none";
+    document.getElementById("library").style.display = "block";
+    document.getElementById("match").style.display = "none";
+    renderLibrary();
   }
 
-  // ---------- export / import ----------
+  function updateHomePreview(){
+    var d = document.getElementById("homeDate").value;
+    var t = document.getElementById("homeTime").value;
+    var today = todayStr();
+    var now = nowTimeStr();
+    document.getElementById("homeDatePreview").textContent = (d === today) ? "Today" : (d ? fmtDate(d) : "Pick a date");
+    document.getElementById("homeTimePreview").textContent = (t === now) ? "Now" : (t ? fmtTime(t) : "Pick a time");
+  }
+
+  // ---------- IMPORT / EXPORT ----------
   function buildExportPayload(){
     return {
       schema: "tennis-match-tracker-v1",
@@ -537,15 +736,12 @@
         var downloads = await window.claude.use("downloads");
         if(downloads){
           await downloads.save({filename: filename, data: json});
-          return; // saved (or handed off) successfully
+          return;
         }
       }
     }catch(e){
-      if(e && e.code === "declined") return; // viewer said no — don't nag with a fallback
-      // any other failure (unavailable, rate_limited, etc.) — fall through to manual copy
+      if(e && e.code === "declined") return;
     }
-    // Not running under a Claude viewer with the downloads capability
-    // (e.g. a self-hosted copy) — try a plain browser download first.
     try{
       var blob = new Blob([json], {type:"application/json"});
       var url = URL.createObjectURL(blob);
@@ -553,7 +749,7 @@
       a.href = url; a.download = filename;
       document.body.appendChild(a); a.click(); document.body.removeChild(a);
       setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
-    }catch(e2){ /* ignore — fallback panel below covers this case too */ }
+    }catch(e2){}
     showExportFallback(json);
   }
 
@@ -562,7 +758,7 @@
       if(statusEl) statusEl.textContent = "That file doesn't look like a match export.";
       return false;
     }
-    var st = payload.state || payload; // tolerate a raw state object too
+    var st = payload.state || payload;
     if(!st.names || !st.stats || !st.log){
       if(statusEl) statusEl.textContent = "That file doesn't look like a match export.";
       return false;
@@ -570,8 +766,6 @@
     if(!st.matchDate) st.matchDate = payload.matchDate || todayStr();
     if(!st.matchTime) st.matchTime = "00:00";
 
-    // Date + time + player names identify "the same match" across devices —
-    // if we already have an entry like this, ask before creating a duplicate.
     var key = matchNaturalKey(st);
     var existing = loadIndex().find(function(e){ return e.naturalKey === key; });
     if(existing){
@@ -587,6 +781,7 @@
 
     S = st;
     history = [];
+    document.getElementById("home").style.display = "none";
     document.getElementById("setup").style.display = "none";
     document.getElementById("library").style.display = "none";
     document.getElementById("match").style.display = "block";
@@ -594,6 +789,7 @@
     return true;
   }
 
+  // ---------- MATCH STATE ----------
   function freshStats(){
     return {ace:0, df:0, returnWinner:0, winner:0, forced:0, unforced:0, overrule:0,
             fhForced:0, bhForced:0, fhUnforced:0, bhUnforced:0, fhWinner:0, bhWinner:0, points:0};
@@ -602,7 +798,7 @@
   function newMatch(nameA, nameB, opts){
     var setsToWin = opts.matchFormat==="custom" ? opts.setsToWin : Math.ceil(opts.bestOf/2);
     var gamesPerSet = opts.matchFormat==="custom" ? opts.gamesPerSet : 6;
-    var tbEarly = opts.matchFormat==="custom"; // custom: TB at (G-1)-(G-1); standard: TB at G-G (i.e. 6-6)
+    var tbEarly = opts.matchFormat==="custom";
     return {
       names:{A:nameA, B:nameB},
       matchDate: opts.matchDate || todayStr(),
@@ -624,6 +820,7 @@
       noAd:false,
       matchOver:false,
       winner:null,
+      closed:false,
       stats:{A:freshStats(), B:freshStats()},
       log:[],
       gameBoundaries:[]
@@ -632,32 +829,6 @@
 
   function opp(p){ return p==="A" ? "B" : "A"; }
   function clone(o){ return JSON.parse(JSON.stringify(o)); }
-  function todayStr(){
-    var d = new Date();
-    var m = String(d.getMonth()+1).padStart(2,"0");
-    var day = String(d.getDate()).padStart(2,"0");
-    return d.getFullYear()+"-"+m+"-"+day;
-  }
-  function nowTimeStr(){
-    var d = new Date();
-    return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");
-  }
-  function safeFileName(s){
-    return String(s).trim().replace(/[^a-zA-Z0-9_-]+/g,"_").replace(/^_+|_+$/g,"") || "player";
-  }
-  function fmtTime(t){
-    if(!t) return "";
-    var parts = t.split(":");
-    if(parts.length<2) return t;
-    var h = parseInt(parts[0],10), m = parts[1];
-    var ampm = h>=12 ? "PM" : "AM";
-    var h12 = h % 12; if(h12===0) h12 = 12;
-    return h12+":"+m+" "+ampm;
-  }
-  function matchNaturalKey(st){
-    return (st.matchDate||"")+"_"+(st.matchTime||"")+"_"+
-      safeFileName(st.names.A).toLowerCase()+"_"+safeFileName(st.names.B).toLowerCase();
-  }
 
   function pushHistory(){
     history.push(clone(S));
@@ -673,37 +844,28 @@
   }
 
   function recordPoint(type, actorPlayer){
-    if(S.matchOver) return;
+    if(S.matchOver || S.closed) return;
     pushHistory();
 
-    var winnerOfPoint;
-    var actor;
+    var winnerOfPoint, actor;
     switch(type){
       case "ace": actor = currentServer(); winnerOfPoint = actor; break;
       case "df": actor = currentServer(); winnerOfPoint = opp(actor); break;
       case "returnWinner": actor = opp(currentServer()); winnerOfPoint = actor; break;
-      case "winner": actor = actorPlayer; winnerOfPoint = actorPlayer; break;
-      case "forced": actor = actorPlayer; winnerOfPoint = opp(actorPlayer); break;
-      case "unforced": actor = actorPlayer; winnerOfPoint = opp(actorPlayer); break;
-      case "fhForced": actor = actorPlayer; winnerOfPoint = opp(actorPlayer); break;
-      case "bhForced": actor = actorPlayer; winnerOfPoint = opp(actorPlayer); break;
-      case "fhUnforced": actor = actorPlayer; winnerOfPoint = opp(actorPlayer); break;
-      case "bhUnforced": actor = actorPlayer; winnerOfPoint = opp(actorPlayer); break;
-      case "fhWinner": actor = actorPlayer; winnerOfPoint = actorPlayer; break;
-      case "bhWinner": actor = actorPlayer; winnerOfPoint = actorPlayer; break;
-      case "overrule": actor = actorPlayer; winnerOfPoint = actorPlayer; break; // point awarded directly, not a shot-quality event
+      case "winner": case "fhWinner": case "bhWinner":
+        actor = actorPlayer; winnerOfPoint = actorPlayer; break;
+      case "forced": case "fhForced": case "bhForced":
+        actor = actorPlayer; winnerOfPoint = opp(actorPlayer); break;
+      case "unforced": case "fhUnforced": case "bhUnforced":
+        actor = actorPlayer; winnerOfPoint = opp(actorPlayer); break;
+      case "overrule": actor = actorPlayer; winnerOfPoint = actorPlayer; break;
     }
 
     S.stats[actor][type]++;
     S.stats[winnerOfPoint].points++;
 
     var scoreBefore = formatPointScore();
-
-    S.log.push({
-      type:type, actor:actor, winner:winnerOfPoint,
-      label: TYPE_LABEL[type],
-      before: scoreBefore
-    });
+    S.log.push({type:type, actor:actor, winner:winnerOfPoint, label: TYPE_LABEL[type], before: scoreBefore});
 
     if(S.inTB){
       S.tbPointsPlayed++;
@@ -713,7 +875,6 @@
       if(winnerOfPoint==="A") S.ptsA++; else S.ptsB++;
       checkGameWin();
     }
-
     render();
   }
 
@@ -721,7 +882,7 @@
     var a=S.ptsA, b=S.ptsB;
     var margin = Math.abs(a-b);
     var win = S.noAd
-      ? (Math.max(a,b)>=4 && (margin>=2 || Math.min(a,b)===3))  // sudden point at 3-3
+      ? (Math.max(a,b)>=4 && (margin>=2 || Math.min(a,b)===3))
       : (Math.max(a,b)>=4 && margin>=2);
     if(win) awardGame(a>b?"A":"B");
   }
@@ -740,7 +901,7 @@
     var tbAt = S.tbEarly ? (G-1) : G;
     if(a===tbAt && b===tbAt){
       S.inTB=true; S.tbA=0; S.tbB=0; S.tbPointsPlayed=0;
-      S.tbStartServer = S.server; // whoever is "up" to serve next game serves first tb point
+      S.tbStartServer = S.server;
       return;
     }
     if(Math.max(a,b)>=G && Math.abs(a-b)>=2){
@@ -754,7 +915,6 @@
       var w = a>b?"A":"B";
       var G = S.gamesPerSet;
       var tbAt = S.tbEarly ? (G-1) : G;
-      // record set score as the tiebreak-set score (loser's games = the TB-trigger count, winner = +1)
       if(w==="A"){ S.gamesA = tbAt+1; S.gamesB = tbAt; }
       else       { S.gamesB = tbAt+1; S.gamesA = tbAt; }
       awardSet(w, true, {a:S.tbA,b:S.tbB});
@@ -766,7 +926,6 @@
     if(winner==="A") S.setWinsA++; else S.setWinsB++;
     S.gamesA=0; S.gamesB=0; S.ptsA=0; S.ptsB=0;
     if(S.inTB){
-      // player who received first tb point serves first game of next set
       S.server = opp(S.tbStartServer);
     }
     S.inTB=false; S.tbA=0; S.tbB=0; S.tbPointsPlayed=0; S.tbStartServer=null;
@@ -783,12 +942,6 @@
     render();
   }
 
-  function pointLabel(n, other){
-    var LBL=["0","15","30","40"];
-    if(n<=3 && !(n===3 && other===3)) return LBL[n];
-    return null; // handled by deuce logic
-  }
-
   function formatPointScore(){
     if(S.inTB) return "TB " + S.tbA + "–" + S.tbB;
     var a=S.ptsA, b=S.ptsB;
@@ -800,7 +953,37 @@
     return LBL[a]+"–"+LBL[b];
   }
 
+  function setsSummary(){
+    return S.completedSets.map(function(s){
+      var str = s.a+"–"+s.b;
+      if(s.tb) str += "("+Math.min(s.tb.a,s.tb.b)+")";
+      return str;
+    }).join(", ");
+  }
+
+  // ---------- CLOSE MATCH ----------
+  function closeMatch(){
+    if(!S || S.matchOver || S.closed) return;
+    if(!confirm("Close this match? It will be marked as finalised. You can still view it in your library.")) return;
+    S.closed = true;
+    S.matchOver = true;
+    // Determine winner by sets, then by games, then by points
+    if(S.setWinsA > S.setWinsB) S.winner = "A";
+    else if(S.setWinsB > S.setWinsA) S.winner = "B";
+    else if(S.gamesA > S.gamesB) S.winner = "A";
+    else if(S.gamesB > S.gamesA) S.winner = "B";
+    else if(S.stats.A.points > S.stats.B.points) S.winner = "A";
+    else if(S.stats.B.points > S.stats.A.points) S.winner = "B";
+    else S.winner = "A"; // fallback
+    S.matchOver = true;
+    render();
+    // update library entry
+    upsertIndexEntry(S);
+  }
+
+  // ---------- RENDER MATCH ----------
   function render(){
+    if(!S) return;
     document.getElementById("sbNameA").textContent = S.names.A;
     document.getElementById("sbNameB").textContent = S.names.B;
     document.getElementById("colNameA").textContent = S.names.A;
@@ -813,7 +996,7 @@
     document.getElementById("gamesA").textContent = S.gamesA;
     document.getElementById("gamesB").textContent = S.gamesB;
 
-    var srv = S.matchOver ? null : currentServer();
+    var srv = (S.matchOver || S.closed) ? null : currentServer();
     document.getElementById("dotA").classList.toggle("on", srv==="A");
     document.getElementById("dotB").classList.toggle("on", srv==="B");
 
@@ -834,11 +1017,10 @@
       document.getElementById("tbTag").textContent = (a>=3&&b>=3&&a===b) ? (S.noAd ? "DECIDING POINT" : "DEUCE") : "";
     }
 
-    // serve block heading + enable state
     document.getElementById("serveHeading").textContent =
-      S.matchOver ? "Serve" : "Serve — " + S.names[srv];
+      (S.matchOver || S.closed) ? "Serve" : "Serve — " + S.names[srv];
     document.getElementById("btnReturnWinner").querySelector("small").textContent =
-      S.matchOver ? "" : S.names[opp(srv)] + " wins";
+      (S.matchOver || S.closed) ? "" : S.names[opp(srv)] + " wins";
 
     document.querySelectorAll("#noAdSeg button").forEach(function(b){
       b.classList.toggle("active", (b.dataset.v==="noad") === !!S.noAd);
@@ -850,10 +1032,15 @@
 
     // banner
     var banner = document.getElementById("banner");
-    if(S.matchOver){
+    if(S.matchOver || S.closed){
       banner.classList.add("show");
-      document.getElementById("bannerTitle").textContent = S.names[S.winner] + " wins the match";
-      document.getElementById("bannerSub").textContent = setsSummary();
+      if(S.closed && !S.setWinsA && !S.setWinsB && S.log.length === 0){
+        document.getElementById("bannerTitle").textContent = "Match closed (no points played)";
+        document.getElementById("bannerSub").textContent = "This match was closed before any points were recorded.";
+      } else {
+        document.getElementById("bannerTitle").textContent = S.names[S.winner] + " wins the match";
+        document.getElementById("bannerSub").textContent = setsSummary();
+      }
       setControlsEnabled(false);
     } else {
       banner.classList.remove("show");
@@ -863,7 +1050,7 @@
     document.getElementById("ovLabelA").textContent = "→ "+S.names.A+" pt";
     document.getElementById("ovLabelB").textContent = "→ "+S.names.B+" pt";
 
-    // stats table
+    // stats
     ["ace","df","returnWinner","winner","forced","unforced","overrule",
      "fhForced","bhForced","fhUnforced","bhUnforced","fhWinner","bhWinner"].forEach(function(k){
       document.getElementById("s_"+k+"_A").textContent = S.stats.A[k];
@@ -872,7 +1059,24 @@
     document.getElementById("s_points_A").innerHTML = "<b>"+S.stats.A.points+"</b>";
     document.getElementById("s_points_B").innerHTML = "<b>"+S.stats.B.points+"</b>";
 
-    document.getElementById("undoBtn").disabled = history.length===0;
+    document.getElementById("undoBtn").disabled = history.length===0 || S.closed;
+
+    // close button state
+    var closeBtn = document.getElementById("closeMatchBtn");
+    var closeHint = document.getElementById("closeMatchHint");
+    if(S.closed){
+      closeBtn.disabled = true;
+      closeBtn.textContent = "Match closed";
+      closeHint.textContent = "This match has been finalised and locked.";
+    } else if(S.matchOver){
+      closeBtn.disabled = true;
+      closeBtn.textContent = "Match already final";
+      closeHint.textContent = "The match reached its natural conclusion.";
+    } else {
+      closeBtn.disabled = false;
+      closeBtn.textContent = "Close match (finalise)";
+      closeHint.textContent = "Finish this match and lock the result into your library.";
+    }
 
     renderLog();
     drawGrowthChart();
@@ -1018,14 +1222,6 @@
     el.innerHTML = '<svg viewBox="0 0 '+w+' '+h+'" style="width:100%;height:auto;display:block;">'+rows+'</svg>';
   }
 
-  function setsSummary(){
-    return S.completedSets.map(function(s){
-      var str = s.a+"–"+s.b;
-      if(s.tb) str += "("+Math.min(s.tb.a,s.tb.b)+")";
-      return str;
-    }).join(", ");
-  }
-
   function setControlsEnabled(on){
     var btns = document.querySelectorAll("#serveBlock button, .pcol button, #btnOverruleA, #btnOverruleB");
     btns.forEach(function(b){ b.disabled = !on; b.style.opacity = on?"1":".4"; });
@@ -1047,11 +1243,8 @@
     el.innerHTML = html;
   }
 
-  // ---------- setup screen wiring ----------
+  // ---------- SETUP WIRING ----------
   var chosenFormat = 3, chosenServer = "A", chosenMatchFormat = "standard";
-  document.getElementById("matchDate").value = todayStr();
-  document.getElementById("matchTime").value = nowTimeStr();
-  updateLibraryBadge();
 
   document.getElementById("matchFormatSeg").addEventListener("click", function(e){
     var b = e.target.closest("button"); if(!b) return;
@@ -1084,8 +1277,9 @@
   document.getElementById("startBtn").addEventListener("click", function(){
     var nameA = document.getElementById("nameA").value.trim() || "Player A";
     var nameB = document.getElementById("nameB").value.trim() || "Player B";
-    var matchDate = document.getElementById("matchDate").value || todayStr();
-    var matchTime = document.getElementById("matchTime").value || nowTimeStr();
+    // Use home page datetime
+    var matchDate = document.getElementById("homeDate").value || todayStr();
+    var matchTime = document.getElementById("homeTime").value || nowTimeStr();
     var opts = { matchFormat: chosenMatchFormat, bestOf: chosenFormat, firstServer: chosenServer, matchDate: matchDate, matchTime: matchTime };
     if(chosenMatchFormat==="custom"){
       var g = parseInt(document.getElementById("gamesPerSet").value,10);
@@ -1098,12 +1292,13 @@
     history = [];
     document.getElementById("noAdSeg").querySelectorAll("button").forEach(function(x){x.classList.remove("active");});
     document.getElementById("noAdSeg").querySelector('[data-v="ad"]').classList.add("active");
+    document.getElementById("home").style.display = "none";
     document.getElementById("setup").style.display = "none";
     document.getElementById("match").style.display = "block";
     render();
   });
 
-  // ---------- match screen wiring ----------
+  // ---------- MATCH SCREEN WIRING ----------
   document.getElementById("btnAce").addEventListener("click", function(){ recordPoint("ace"); });
   document.getElementById("btnDF").addEventListener("click", function(){ recordPoint("df"); });
   document.getElementById("btnReturnWinner").addEventListener("click", function(){ recordPoint("returnWinner"); });
@@ -1116,6 +1311,7 @@
 
   document.getElementById("noAdSeg").addEventListener("click", function(e){
     var b = e.target.closest("button"); if(!b || !S) return;
+    if(S.matchOver || S.closed) return;
     this.querySelectorAll("button").forEach(function(x){x.classList.remove("active");});
     b.classList.add("active");
     S.noAd = (b.dataset.v === "noad");
@@ -1130,7 +1326,7 @@
   document.getElementById("copyExportBtn").addEventListener("click", function(){
     var ta = document.getElementById("exportText");
     ta.select();
-    try{ navigator.clipboard.writeText(ta.value); }catch(e){ /* selection alone still lets them copy manually */ }
+    try{ navigator.clipboard.writeText(ta.value); }catch(e){}
   });
 
   document.getElementById("importBtn").addEventListener("click", function(){
@@ -1151,33 +1347,46 @@
     };
     reader.onerror = function(){ status.textContent = "Couldn't read that file."; };
     reader.readAsText(file);
-    e.target.value = ""; // allow re-selecting the same file later
+    e.target.value = "";
   });
 
-  document.getElementById("undoBtn").addEventListener("click", undo);
+  document.getElementById("undoBtn").addEventListener("click", function(){
+    if(S && !S.closed) undo();
+  });
   document.getElementById("resetBtn").addEventListener("click", function(){
+    if(S && !S.closed && S.log.length > 0 && !confirm("Start a new match? Current match stays in your library.")) return;
     clearActivePointer();
-    document.getElementById("match").style.display = "none";
-    document.getElementById("setup").style.display = "block";
-    updateLibraryBadge();
+    S = null;
+    showHome();
   });
 
-  // ---------- library screen wiring ----------
-  document.getElementById("libraryBtn").addEventListener("click", function(){
-    document.getElementById("setup").style.display = "none";
-    document.getElementById("library").style.display = "block";
-    renderLibrary();
+  document.getElementById("closeMatchBtn").addEventListener("click", closeMatch);
+
+  // ---------- HOME / NAV WIRING ----------
+  document.getElementById("homeNewMatchBtn").addEventListener("click", function(){
+    // carry datetime from home into setup context
+    showSetup();
+    document.getElementById("matchDate").value = document.getElementById("homeDate").value || todayStr();
+    document.getElementById("matchTime").value = document.getElementById("homeTime").value || nowTimeStr();
   });
+
+  document.getElementById("homeLibraryBtn").addEventListener("click", showLibrary);
+  document.getElementById("homeDate").addEventListener("change", updateHomePreview);
+  document.getElementById("homeTime").addEventListener("change", updateHomePreview);
+
+  document.getElementById("setupBackLink").addEventListener("click", showHome);
+  document.getElementById("libraryBackLink").addEventListener("click", showHome);
+
   document.getElementById("libraryNavBtn").addEventListener("click", function(){
-    document.getElementById("match").style.display = "none";
-    document.getElementById("library").style.display = "block";
-    renderLibrary();
+    showLibrary();
   });
+
   document.getElementById("libraryNewBtn").addEventListener("click", function(){
-    document.getElementById("library").style.display = "none";
-    document.getElementById("setup").style.display = "block";
-    updateLibraryBadge();
+    showSetup();
+    document.getElementById("matchDate").value = document.getElementById("homeDate").value || todayStr();
+    document.getElementById("matchTime").value = document.getElementById("homeTime").value || nowTimeStr();
   });
+
   document.getElementById("libraryList").addEventListener("click", function(e){
     var row = e.target.closest(".lib-row");
     if(!row) return;
@@ -1188,27 +1397,40 @@
       if(confirm("Delete this match? This can't be undone.")){
         deleteMatchById(id);
         renderLibrary();
+        updateHomeCount();
       }
     } else {
       openMatchFromLibrary(id);
     }
   });
 
-  // ---------- restore a previously in-progress match, if any ----------
-  (function tryRestore(){
+  // ---------- INIT ----------
+  (function init(){
+    // Prefill home datetime
+    document.getElementById("homeDate").value = todayStr();
+    document.getElementById("homeTime").value = nowTimeStr();
+    updateHomePreview();
+    updateHomeCount();
+
+    // Try restore active match
     var activeId = null;
     try{ activeId = localStorage.getItem(ACTIVE_KEY); }catch(e){}
-    if(!activeId) return;
-    var saved = loadMatchById(activeId);
-    if(!saved) return;
-    S = saved;
-    history = [];
-    document.getElementById("setup").style.display = "none";
-    document.getElementById("match").style.display = "block";
-    document.querySelectorAll("#formatSeg button").forEach(function(x){
-      x.classList.toggle("active", x.dataset.v === String(S.bestOf));
-    });
-    render();
+    if(activeId){
+      var saved = loadMatchById(activeId);
+      if(saved){
+        S = saved;
+        history = [];
+        document.getElementById("home").style.display = "none";
+        document.getElementById("match").style.display = "block";
+        document.querySelectorAll("#formatSeg button").forEach(function(x){
+          x.classList.toggle("active", x.dataset.v === String(S.bestOf));
+        });
+        render();
+        return;
+      }
+    }
+    // No active match — show home
+    showHome();
   })();
 
 })();
